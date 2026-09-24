@@ -1,0 +1,10 @@
+openai
+google-generativeai
+elevenlabs
+edge-tts
+moviepy
+requests
+yt-dlp
+acrcloud
+gunicorn
+flask
