@@ -1,0 +1,77 @@
+{
+  "generated": "2026-10-05",
+  "language": "en",
+  "signals_used": 70,
+  "candidates": [
+    {
+      "working_title": "The End of Backprop: Is Your AI Learning All Wrong?",
+      "angle": "Move beyond standard transformer architecture to explain the 'Weight Transport' problem and explore why researchers are now trying to train models without the backpropagation algorithm.",
+      "why_now": "Recent breakthroughs in training transformers without backpropagation are being discussed on technical forums as a potential paradigm shift for AI efficiency.",
+      "depth_check": "Yes, this covers the fundamental computer science problem of how neural networks learn, which is deep enough for a technical audience.",
+      "research_queries": [
+        "what is the weight transport problem in deep learning",
+        "training transformers without backpropagation research paper",
+        "biological plausibility of artificial neural networks",
+        "feedback alignment in neural networks",
+        "future of AI training efficiency techniques"
+      ],
+      "risk": "Low; however, technical nuances must be explained carefully to avoid overhyping experimental research as an immediate industry standard."
+    },
+    {
+      "working_title": "The Surveillance Paradox: Why Smart Glasses Are Being Banned",
+      "angle": "Shift the focus from 'privacy concerns' to a geopolitical and regulatory analysis of why Norway and others are targeting smart glasses as the first 'non-compliance' frontier for AI hardware.",
+      "why_now": "Norway and other nations are initiating crackdowns on smart glasses, indicating a new phase of AI hardware regulation.",
+      "depth_check": "Yes, this allows for a 20-minute discussion on the intersection of human rights law, hardware design, and government surveillance powers.",
+      "research_queries": [
+        "Norway smart glasses ban rationale",
+        "privacy implications of wearable AI cameras",
+        "EU AI Act and wearable technology regulations",
+        "history of data protection laws regarding smart devices",
+        "future of augmented reality privacy policy"
+      ],
+      "risk": "Medium; ensure the distinction between existing laws and proposed bans remains clear to avoid spreading misinformation."
+    },
+    {
+      "working_title": "AI in Mathematics: The Death of Human Proofs?",
+      "angle": "Examine the tension between AI agents discovering new materials/theorems and the mathematical community's struggle to 'verify' machine-generated logic.",
+      "why_now": "Recent high-profile news about AI agents discovering magnetic semiconductors and the ongoing debate regarding 'AI takeover' of mathematics.",
+      "depth_check": "Yes, this can explore the history of automated theorem proving and the philosophical implications of 'black box' math.",
+      "research_queries": [
+        "impact of AI on mathematical research discovery",
+        "can AI prove new mathematical theorems",
+        "hallucination risks in AI-driven scientific research",
+        "AI agents discovering room-temperature magnetic semiconductors",
+        "formal verification of AI generated math"
+      ],
+      "risk": "Low; the topic is speculative but grounded in current scientific reporting."
+    },
+    {
+      "working_title": "The Digital Archiving Crisis: Why Your Data Isn't Safe",
+      "angle": "Contrast the rise of 'AI-everything' with the crumbling reality of long-term digital storage, focusing on M-Disk, LTO, and why we are losing our digital history.",
+      "why_now": "A resurgence in interest regarding offline, durable storage (like Blu-ray M-Disk) is appearing in tech circles as cloud reliability faces scrutiny.",
+      "depth_check": "Yes, this provides a practical, long-form discussion on data durability, bit rot, and the limitations of cloud-based life.",
+      "research_queries": [
+        "what is M-Disk storage technology",
+        "long-term digital archival methods for consumers",
+        "risks of cloud-only data storage",
+        "bit rot in digital storage media",
+        "best practices for cold storage backup 2026"
+      ],
+      "risk": "None; this is a standard IT infrastructure and consumer advice topic."
+    },
+    {
+      "working_title": "Prediction Markets: Why We're Betting on the Past",
+      "angle": "Analyze the rapid growth of prediction markets like Kalshi not just as gambling, but as a new, radical 'source of truth' that is increasingly influencing political and tech outcomes.",
+      "why_now": "Increased mainstream media coverage on people turning to prediction markets after financial instability, and their growing role in forecasting global events.",
+      "depth_check": "Yes, this covers the economics, game theory, and societal implications of gamifying information and truth.",
+      "research_queries": [
+        "how do prediction markets work for news events",
+        "Kalshi and the economics of information markets",
+        "accuracy of prediction markets vs traditional polling",
+        "regulatory status of prediction markets in US",
+        "can prediction markets be manipulated"
+      ],
+      "risk": "Medium; ensure the video does not promote specific financial bets, focusing instead on the platform mechanics and societal impact."
+    }
+  ]
+}
