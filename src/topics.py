@@ -1,5 +1,5 @@
 """Trend sinyallerinden aday video konulari uretir -> data/candidates.json"""
-import os, sys, json, datetime
+import os, sys, json, time, datetime
 import requests, yaml
 from trends import collect
 
@@ -23,17 +23,35 @@ SIGNALS:
 {signals}
 """
 
+RETRY_CODES = (429, 500, 502, 503, 504)
 
-def call_gemini(model, key, prompt):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-    r = requests.post(
-        url, params={"key": key}, timeout=120,
-        json={"contents": [{"parts": [{"text": prompt}]}],
-              "generationConfig": {"responseMimeType": "application/json", "temperature": 0.8}},
-    )
-    r.raise_for_status()
-    text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
-    return json.loads(text)
+
+def call_gemini(models, key, prompt):
+    for model in models:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        for attempt in range(1, 5):
+            try:
+                r = requests.post(
+                    url, params={"key": key}, timeout=180,
+                    json={"contents": [{"parts": [{"text": prompt}]}],
+                          "generationConfig": {"responseMimeType": "application/json",
+                                               "temperature": 0.8}},
+                )
+            except requests.RequestException as e:
+                print(f"[{model}] baglanti hatasi: {e}")
+                time.sleep(20 * attempt)
+                continue
+            if r.status_code == 200:
+                parts = r.json()["candidates"][0]["content"]["parts"]
+                text = "".join(p.get("text", "") for p in parts)
+                print(f"Model kullanildi: {model}")
+                return json.loads(text)
+            print(f"[{model}] deneme {attempt}: HTTP {r.status_code}")
+            if r.status_code in RETRY_CODES:
+                time.sleep(20 * attempt)
+                continue
+            break  # 404 gibi kalici hata: siradaki modele gec
+    sys.exit("Hicbir model yanit vermedi.")
 
 
 def main(profile_path="config/profile_en.yaml"):
@@ -46,7 +64,9 @@ def main(profile_path="config/profile_en.yaml"):
     prompt = PROMPT.format(theme=cfg["theme"], audience=cfg["audience"],
                            minutes=cfg["video_minutes"], n=cfg["candidates_count"],
                            signals=lines)
-    candidates = call_gemini(cfg["gemini_model"], key, prompt)
+    models = [cfg["gemini_model"]] + cfg.get(
+        "fallback_models", ["gemini-3.1-flash-lite", "gemini-2.5-flash-lite"])
+    candidates = call_gemini(models, key, prompt)
     out = {"generated": datetime.date.today().isoformat(),
            "language": cfg["language"], "signals_used": len(signals),
            "candidates": candidates}
