@@ -1,13 +1,13 @@
 # Dil/nis profili. Yeni dil eklemek icin bu dosyayi kopyalayip degistirmek yeterli.
-channel_name: "TBD"          # kanal adi netlesince doldurulacak
+channel_name: "TBD"
 language: "en"
 audience: "global-english"
 theme: "technology and AI"
 video_minutes: 20
-tts_voice: "en-US-AndrewNeural"   # Edge-TTS sesi (sonra degistirilebilir)
+tts_voice: "en-US-AndrewNeural"
 trends:
   youtube_region: "US"
-  youtube_category_id: "28"       # Science & Technology
+  youtube_category_id: "28"
   hackernews_top_n: 30
   rss_feeds:
     - https://www.theverge.com/rss/index.xml
@@ -15,5 +15,6 @@ trends:
     - https://techcrunch.com/feed/
     - https://www.wired.com/feed/rss
   rss_per_feed: 10
-gemini_model: "gemini-flash-latest"  # model adi degisirse sadece burayi guncelle
+gemini_model: "gemini-3.5-flash-lite"
+fallback_models: ["gemini-3.1-flash-lite", "gemini-3.6-flash"]
 candidates_count: 5
