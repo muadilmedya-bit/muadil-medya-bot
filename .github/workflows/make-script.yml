@@ -22,7 +22,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           CANDIDATE: ${{ github.event.inputs.candidate_number }}
-          run: python -u src/script.py "$CANDIDATE" config/profile_en.yaml
+        run: python -u src/script.py "$CANDIDATE" config/profile_en.yaml
       - name: Commit script
         run: |
           git config user.name "research-bot"
