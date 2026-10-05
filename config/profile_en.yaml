@@ -15,5 +15,5 @@ trends:
     - https://techcrunch.com/feed/
     - https://www.wired.com/feed/rss
   rss_per_feed: 10
-gemini_model: "gemini-2.5-flash"  # model adi degisirse sadece burayi guncelle
+gemini_model: "gemini-flash-latest"  # model adi degisirse sadece burayi guncelle
 candidates_count: 5
