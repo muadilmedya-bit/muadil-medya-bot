@@ -2,9 +2,13 @@ name: Make script
 on:
   workflow_dispatch:
     inputs:
+      custom_topic:
+        description: "Your own topic in English (leave empty to use a candidate)"
+        required: false
+        default: ""
       candidate_number:
-        description: "Which candidate topic (1-5)"
-        required: true
+        description: "Candidate topic 1-5 (used only if custom topic is empty)"
+        required: false
         default: "4"
 permissions:
   contents: write
@@ -22,6 +26,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           CANDIDATE: ${{ github.event.inputs.candidate_number }}
+          CUSTOM_TOPIC: ${{ github.event.inputs.custom_topic }}
         run: python -u src/script.py "$CANDIDATE" config/profile_en.yaml
       - name: Commit script
         run: |
