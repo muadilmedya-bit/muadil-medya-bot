@@ -5,7 +5,7 @@ Cikti: data/script.json ve data/script.md
 import os, sys, json, time, datetime
 import requests, yaml
 from llm import ask, set_budget, summary
-from verify import verify_section, norm
+from verify import verify_section, revise_section, norm, BLOCKING
 
 API = "https://en.wikipedia.org/w/api.php"
 UA = {"User-Agent": "weekly-video-bot/0.3 (educational research; "
@@ -15,7 +15,7 @@ MAX_CHARS = 8000
 SECTIONS = 11
 TARGET_WORDS = 340      # modele istenen kelime (model genelde daha kisa yazar)
 MIN_WORDS = 240         # bunun altindaysa bolum genisletilir
-SLEEP_BETWEEN = 8       # saniye, Gemini hiz siniri icin
+SLEEP_BETWEEN = 4       # saniye, Gemini hiz siniri icin
 
 
 def wiki_get(params, tries=5):
@@ -123,7 +123,13 @@ Rules:
   question promises (do not stop halfway through the story).
 - If a popular myth surrounds this topic, find out from the reference material what is actually true and
   address the myth honestly in the video. Never present a myth as fact, not even in the title.
-- Each anecdote, example, scene or person introduction may appear in the key_points of ONE section only.
+- Each anecdote, example, scene, event or person introduction may appear in the key_points of ONE
+  section only. No fact may be listed in two sections.
+- Order the sections chronologically. After section 2, never jump back in time.
+- Section 1 is a scene and a question only: it must not summarize the story that follows.
+- Balance the sections: each one gets 4-5 key_points and about the same amount of story. If one event
+  has many details (for example a famous first test), split it over two sections instead of making one
+  giant section.
 - No whole sections of textbook definitions or unrelated background.
 - Use ONLY facts found in the reference material. All output in English.
 
@@ -152,19 +158,25 @@ Key points to cover: {points}
 SCRIPT SO FAR (earlier sections, already told; never repeat their scenes, anecdotes, examples or analogies):
 {so_far}
 
+RESERVED FOR OTHER SECTIONS (do not tell these facts here; at most mention them in half a sentence):
+{reserved}
+
 STRICT RULES:
 - Use ONLY facts found in the reference material. Never invent a number, date, name or quote.
 - Be careful with dates: say exactly what the reference material says happened on that date, and keep the
   order of events as the material gives it.
 - Avoid absolute claims (never, always, no one, impossible) unless the reference material says so.
 - If the material is thin on a point, say less rather than padding with vague claims.
-- Write {words} words or more. Spoken English a narrator reads aloud: conversational and vivid, speaking
-  to the viewer as "you", short sentences.
+- Write {words} words or more, but never more than {max_words}. Spoken English a narrator reads aloud:
+  conversational and vivid, speaking to the viewer as "you", short sentences.
+- Explain technical terms in plain words, or leave them out. Never use jargon the viewer cannot picture.
 - At most 3 numbers or dates in the whole section, only those that matter to the story.
 - At most ONE analogy in this section, and do not reuse an analogy theme that appears in the script so far
   (for example railways, highways, mail or postal service, shipping, libraries).
-- Do not use the phrases "Think of it like", "Imagine" or "Picture". Do not start the section with "As",
-  "While" or "Building on". Vary your sentence openings.
+- Never use these phrases or words: "Think of it like", "Imagine", "Picture", "As a clear example",
+  "Building directly on", "Stepping back", "Moving from", "Furthermore", "pivotal", "foundational",
+  "brilliant", "vital", "groundbreaking". Do not start the section with "As", "While" or "Building on".
+  Vary your sentence openings.
 - Do NOT write like an encyclopedia: no definition lists, no "X is a type of Y that..." openings.
 - Explain in your own words; do not copy sentence structure from the material.
 - No markdown, bullet points, stage directions or URLs. No phrases like "in this section" or "according to".
@@ -262,7 +274,7 @@ def main(index="1", profile_path="config/profile_en.yaml"):
     key = os.environ.get("GEMINI_API_KEY")
     if not key:
         sys.exit("GEMINI_API_KEY tanimli degil")
-    set_budget(cfg.get("max_calls_per_run", 70))
+    set_budget(cfg.get("max_calls_per_run", 80))
     models = [cfg["gemini_model"]] + cfg.get(
         "fallback_models", ["gemini-3.1-flash-lite", "gemini-3.6-flash"])
 
@@ -305,26 +317,33 @@ def main(index="1", profile_path="config/profile_en.yaml"):
     question = outline["central_question"]
     print("Merkezi soru:", question)
 
-    sections, told, all_results = [], [], []
+    sections, told, final_results = [], [], []
+    first_counts, revised_sections = {}, []
     for i, sec in enumerate(plan, 1):
         if i == 1:
             style = ("Open with the vivid scene in your first two sentences, "
-                     "then pose the central question so the viewer must keep watching.")
+                     "then pose the central question so the viewer must keep watching. "
+                     "Do not summarize the story that follows.")
         elif i == len(plan):
-            style = ("End with a clear takeaway that ties back to the central question, then a short, "
-                     "natural sign-off. Do not ask for likes or subscriptions.")
+            style = ("Do not recap names or events. Answer the central question directly in two or three "
+                     "sentences, give one memorable takeaway, then a short natural sign-off. "
+                     "Do not ask for likes or subscriptions.")
         else:
             style = ("Start with one natural sentence that connects to the previous section, "
                      "then move the story forward without repeating it.")
+        reserved = "\n".join(
+            f"[{j}] {s['heading']}: " + "; ".join(s["key_points"])
+            for j, s in enumerate(plan, 1) if j != i) or "(none)"
         so_far = "\n\n".join(f"[{j}] {t}" for j, t in enumerate(told, 1)) or \
                  "(nothing yet, this is the first section)"
         out = ask(models, key, SECTION_PROMPT.format(
             theme=theme, title=title, question=question,
             outline=json.dumps(headings), i=i, n=len(plan), heading=sec["heading"],
             purpose=sec.get("purpose", ""), points=json.dumps(sec["key_points"]),
-            so_far=so_far, words=TARGET_WORDS, style=style, material=material),
+            so_far=so_far, reserved=reserved, words=TARGET_WORDS,
+            max_words=int(TARGET_WORDS * 1.4), style=style, material=material),
             need=["narration", "visuals"])
-        narration = out["narration"].strip()
+        narration = txt(out["narration"])
         wc = len(narration.split())
         if wc < MIN_WORDS:
             print(f"Bolum {i}: {wc} kelime cok kisa, genisletiliyor...")
@@ -332,27 +351,39 @@ def main(index="1", profile_path="config/profile_en.yaml"):
             more = ask(models, key, EXPAND_PROMPT.format(
                 words=TARGET_WORDS, heading=sec["heading"], so_far=so_far,
                 narration=narration, material=material), need=["narration"])
-            if len(more["narration"].split()) > wc:
-                narration = more["narration"].strip()
+            if len(txt(more["narration"]).split()) > wc:
+                narration = txt(more["narration"])
         time.sleep(SLEEP_BETWEEN)
 
-        narration, results = verify_section(models, key, narration, material, material_norm)
+        results = verify_section(models, key, narration, material, material_norm)
+        for r in results:
+            first_counts[r["status"]] = first_counts.get(r["status"], 0) + 1
+        issues = [r for r in results if r["status"] in BLOCKING]
+        if issues:
+            print(f"Bolum {i}: {len(issues)} sorunlu iddia, duzeltiliyor...")
+            time.sleep(SLEEP_BETWEEN)
+            new = revise_section(models, key, sec["heading"], so_far, narration, issues, material)
+            if len(new.split()) >= 0.6 * len(narration.split()):
+                narration = new
+                revised_sections.append(i)
+                time.sleep(SLEEP_BETWEEN)
+                results = verify_section(models, key, narration, material, material_norm)
         for r in results:
             r["section"] = i
-        all_results += results
-        bad = [r for r in results if r["status"] != "supported"]
+        final_results += results
+        left = [r for r in results if r["status"] != "supported"]
         print(f"Bolum {i}/{len(plan)}: {len(narration.split())} kelime, "
-              f"{len(results)} iddia, {len(bad)} supheli")
+              f"{len(results)} iddia, {len(left)} supheli kaldi")
         sections.append({"heading": sec["heading"], "narration": narration,
                          "visuals": normalize_visuals(out["visuals"])})
         told.append(narration)
         time.sleep(SLEEP_BETWEEN)
 
     words = sum(len(s["narration"].split()) for s in sections)
-    counts = {}
-    for r in all_results:
-        counts[r["status"]] = counts.get(r["status"], 0) + 1
-    flagged = [r for r in all_results if r["status"] != "supported" or r["auto_fixed"]]
+    final_counts = {}
+    for r in final_results:
+        final_counts[r["status"]] = final_counts.get(r["status"], 0) + 1
+    flagged = [r for r in final_results if r["status"] != "supported"]
     src_lines = "\n".join(f"- {s['title']} (Wikipedia): {s['url']}" for s in sources)
     description = (outline["description"].strip() + "\n\nSources:\n" + src_lines +
                    "\n\n" + " ".join(outline["hashtags"]))
@@ -369,13 +400,15 @@ def main(index="1", profile_path="config/profile_en.yaml"):
         "estimated_minutes": round(words / 150, 1),
         "sections": sections,
         "sources": [{"title": s["title"], "url": s["url"]} for s in sources],
-        "verification": {"counts": counts, "flagged": flagged},
+        "verification": {"first_pass_counts": first_counts, "final_counts": final_counts,
+                         "revised_sections": revised_sections, "flagged": flagged},
         "gemini_usage": usage,
     }
     os.makedirs("data", exist_ok=True)
     with open("data/script.json", "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
+    fmt = lambda d: ", ".join(f"{k}: {v}" for k, v in sorted(d.items())) or "none"
     md = [f"# {title}", "",
           "**Central question:** " + question, "",
           "**Title options:** " + " | ".join(outline["title_options"]), "",
@@ -387,21 +420,23 @@ def main(index="1", profile_path="config/profile_en.yaml"):
         md += [f"## {i}. {s['heading']}", "", s["narration"], "",
                "*Visuals:* " + "; ".join(f"[{v['type']}] {v['query']}" for v in s["visuals"]), ""]
     md += ["## Verification report", "",
-           f"Checked {len(all_results)} claims against the sources: " +
-           ", ".join(f"{k}: {v}" for k, v in sorted(counts.items())), ""]
+           f"First pass: {fmt(first_counts)}",
+           f"After revision: {fmt(final_counts)}",
+           f"Sections revised automatically: {revised_sections or 'none'}", "",
+           "Items below were not confirmed by the sources. Check them by hand before publishing:", ""]
     if not flagged:
-        md += ["No problems found.", ""]
+        md += ["- none", ""]
     for r in flagged:
-        line = f"- (Section {r['section']}) [{r['status']}{', auto-fixed' if r['auto_fixed'] else ''}] {r['claim']}"
+        line = f"- (Section {r['section']}) [{r['status']}] {r['claim']}"
         if r["fix"]:
             line += f"  -> suggested: {r['fix']}"
         if r["evidence"]:
-            line += f"  (source says: \"{r['evidence']}\")"
+            line += f'  (source: "{r["evidence"]}")'
         md.append(line)
     with open("data/script.md", "w", encoding="utf-8") as f:
         f.write("\n".join(md))
     print(f"Tamam: {words} kelime, yaklasik {result['estimated_minutes']} dakika, "
-          f"{usage['calls']} Gemini cagrisi, dogrulama: {counts}")
+          f"{usage['calls']} Gemini cagrisi, dogrulama (ilk/son): {first_counts} / {final_counts}")
 
 
 if __name__ == "__main__":
