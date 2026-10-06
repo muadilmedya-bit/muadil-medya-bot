@@ -218,6 +218,45 @@ def normalize_visuals(raw):
     return out
 
 
+def txt(x):
+    """Gemini bazen duz metin yerine {'title': ...} gibi kutular dondurur; metne cevirir."""
+    if isinstance(x, str):
+        return x.strip()
+    if isinstance(x, dict):
+        for k in ("title", "text", "name", "option", "value", "hashtag", "description"):
+            if isinstance(x.get(k), str):
+                return x[k].strip()
+        for v in x.values():
+            if isinstance(v, str):
+                return v.strip()
+        return json.dumps(x, ensure_ascii=False)
+    if isinstance(x, list):
+        return " ".join(txt(i) for i in x)
+    return str(x).strip()
+
+
+def as_list(x):
+    return x if isinstance(x, list) else [x]
+
+
+def clean_outline(o):
+    o["central_question"] = txt(o["central_question"])
+    o["description"] = txt(o["description"])
+    o["thumbnail_text"] = txt(o["thumbnail_text"])
+    o["title_options"] = [t for t in (txt(t) for t in as_list(o["title_options"])) if t] or ["Untitled"]
+    tags = []
+    for h in as_list(o["hashtags"]):
+        h = txt(h).replace(" ", "")
+        if h:
+            tags.append(h if h.startswith("#") else "#" + h)
+    o["hashtags"] = tags[:5]
+    for sec in o["sections"]:
+        sec["heading"] = txt(sec.get("heading", ""))
+        sec["purpose"] = txt(sec.get("purpose", ""))
+        sec["key_points"] = [txt(k) for k in as_list(sec.get("key_points", []))]
+    return o
+
+
 def main(index="1", profile_path="config/profile_en.yaml"):
     cfg = yaml.safe_load(open(profile_path, encoding="utf-8"))
     key = os.environ.get("GEMINI_API_KEY")
@@ -259,6 +298,7 @@ def main(index="1", profile_path="config/profile_en.yaml"):
         n=SECTIONS, m=SECTIONS - 1, material=material),
         need=["central_question", "title_options", "description",
               "hashtags", "thumbnail_text", "sections"])
+    outline = clean_outline(outline)
     plan = outline["sections"]
     headings = [s["heading"] for s in plan]
     title = outline["title_options"][0]
