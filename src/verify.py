@@ -1,11 +1,10 @@
-"""Dogrulayici ve duzeltmen.
-Dogrulayici: bolumdeki iddialari kaynak metne karsi kontrol eder. 'supported' diyen her iddia icin
-kaynaktan birebir alinti ister ve alintinin kaynakta gercekten var olup olmadigini kendisi kontrol eder.
-Duzeltmen: sorunlu iddialari (celisen, desteksiz, kaynaklarin kendi arasinda celistigi) metinden temizler."""
+"""Dogrulayici ve duzenleyici.
+- verify_section: bolumdeki iddialari kaynak metne karsi kontrol eder; 'supported' diyen her iddia icin
+  kaynaktan birebir alinti ister ve alintinin kaynakta var olup olmadigini kendisi kontrol eder.
+- apply_edits: sadece guvenli duzenlemeleri yapar (cakisan kaynak -> cumleyi sil; kanitli duzeltme -> degistir).
+- drop_repeats: onceki bolumlerde zaten anlatilmis cumleleri siler (model kopyalasa bile)."""
 import re
 from llm import ask
-
-BLOCKING = {"contradicted", "unsupported", "conflict"}
 
 VERIFY_PROMPT = """You are a strict fact-checker for a YouTube script.
 Check the NARRATION against the REFERENCE MATERIAL only. Do not use outside knowledge.
@@ -24,8 +23,8 @@ For each claim return an object with:
 - evidence: an EXACT quote of at most 25 words copied character for character from the reference
   material (for "conflict", quote one of the disagreeing passages); empty string for "unsupported".
   Never use a sentence from the narration as evidence.
-- fix: for "contradicted", the corrected sentence; for "unsupported" or "conflict", a replacement
-  sentence that leaves out the problem detail, or the single word REMOVE; otherwise an empty string
+- fix: for "contradicted", the corrected sentence; for "unsupported" or "conflict", the single word
+  REMOVE; otherwise an empty string
 
 Return ONLY a JSON object: {{"claims": [ ... ]}}
 
@@ -36,39 +35,21 @@ REFERENCE MATERIAL:
 {material}
 """
 
-REVISE_PROMPT = """You are editing one section of a YouTube script after a fact-check.
-Rewrite the narration so that every problem listed below is fixed.
-
-PROBLEMS:
-{issues}
-
-How to fix each kind:
-- contradicted: replace the claim with what the evidence says.
-- unsupported: delete the claim, or rephrase the sentence without the unsupported detail.
-- conflict: the sources disagree about this detail, so leave the contested detail out completely.
-
-Keep everything else: the order, the style and roughly the same length (do not shorten the section by
-more than 10 percent; if you remove something, replace it with other facts from the reference material
-that are not already told in the earlier sections). Spoken English for a narrator, no markdown.
-Do not add any fact that is not in the reference material.
-
-SECTION: {heading}
-
-SCRIPT SO FAR:
-{so_far}
-
-NARRATION TO FIX:
-{narration}
-
-Return ONLY a JSON object with the single key narration.
-
-REFERENCE MATERIAL:
-{material}
-"""
+ABBR = re.compile(r"(?:\b[A-Z]|\b(?:Mr|Mrs|Ms|Dr|St|vs|No|Inc|Corp|Jr|Sr))\.$")
 
 
 def norm(s):
     return re.sub(r"\W+", " ", s.lower()).strip()
+
+
+def split_sentences(text):
+    out = []
+    for p in re.split(r"(?<=[.!?])\s+", text.strip()):
+        if out and ABBR.search(out[-1]):
+            out[-1] += " " + p
+        else:
+            out.append(p)
+    return [p for p in out if p]
 
 
 def evidence_ok(evidence, material_norm):
@@ -99,17 +80,55 @@ def verify_section(models, key, narration, material, material_norm):
     return results
 
 
-def revise_section(models, key, heading, so_far, narration, issues, material):
-    lines = []
-    for r in issues:
-        line = f"- [{r['status']}] {r['claim']}"
-        if r["evidence"]:
-            line += f"\n  evidence: {r['evidence']}"
-        if r["fix"]:
-            line += f"\n  suggested replacement: {r['fix']}"
-        lines.append(line)
-    out = ask(models, key, REVISE_PROMPT.format(
-        issues="\n".join(lines), heading=heading, so_far=so_far,
-        narration=narration, material=material), need=["narration"], temperature=0.3)
-    text = out["narration"]
-    return text.strip() if isinstance(text, str) else narration
+def _tok(s):
+    return re.findall(r"[A-Za-z0-9]+", s)
+
+
+def safe_fix(r, material_norm):
+    """Duzeltme ancak kaynak alintisi dogrulanmissa ve yeni rakam/ozel isimler alintida varsa uygulanir."""
+    fix, ev = r.get("fix", "").strip(), r.get("evidence", "")
+    if not fix or fix.upper() == "REMOVE" or not evidence_ok(ev, material_norm):
+        return False
+    new = set(_tok(fix)) - set(_tok(r["claim"]))
+    if any(len(t) == 1 and not t.isdigit() for t in new):   # tek harf farki guvenilmez
+        return False
+    evt = set(_tok(ev))
+    return all(t in evt for t in new if t.isdigit() or t[0].isupper())
+
+
+def apply_edits(narration, results, material_norm):
+    text, edits = narration, []
+    for r in results:
+        if r["status"] == "conflict":
+            new = ""
+        elif r["status"] == "contradicted" and safe_fix(r, material_norm):
+            new = r["fix"]
+        else:
+            continue
+        applied = r["claim"] in text
+        if applied:
+            text = text.replace(r["claim"], new, 1)
+        edits.append({"claim": r["claim"], "status": r["status"],
+                      "replacement": new, "applied": applied})
+    return re.sub(r"[ \t]{2,}", " ", text).strip(), edits
+
+
+def shingles(text, n=7):
+    w = norm(text).split()
+    return {" ".join(w[i:i + n]) for i in range(max(0, len(w) - n + 1))}
+
+
+def drop_repeats(narration, previous_texts, thresh=0.5):
+    """Daha once anlatilmis (en az %50'si ayni) cumleleri siler."""
+    seen = set()
+    for t in previous_texts:
+        seen |= shingles(t)
+    kept, dropped = [], []
+    for sent in split_sentences(narration):
+        sh = shingles(sent)
+        if len(sh) >= 3 and len(sh & seen) / len(sh) >= thresh:
+            dropped.append(sent)
+            continue
+        kept.append(sent)
+        seen |= sh
+    return " ".join(kept), dropped

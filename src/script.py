@@ -5,7 +5,7 @@ Cikti: data/script.json ve data/script.md
 import os, sys, json, time, datetime
 import requests, yaml
 from llm import ask, set_budget, summary
-from verify import verify_section, revise_section, norm, BLOCKING
+from verify import verify_section, apply_edits, drop_repeats, norm
 
 API = "https://en.wikipedia.org/w/api.php"
 UA = {"User-Agent": "weekly-video-bot/0.3 (educational research; "
@@ -13,9 +13,7 @@ UA = {"User-Agent": "weekly-video-bot/0.3 (educational research; "
 MAX_SOURCES = 10
 MAX_CHARS = 8000
 SECTIONS = 11
-TARGET_WORDS = 340      # modele istenen kelime (model genelde daha kisa yazar)
-MIN_WORDS = 240         # bunun altindaysa bolum genisletilir
-SLEEP_BETWEEN = 4       # saniye, Gemini hiz siniri icin
+SLEEP_BETWEEN = 6       # saniye, Gemini hiz siniri icin
 
 
 def wiki_get(params, tries=5):
@@ -216,6 +214,11 @@ REFERENCE MATERIAL:
 {material}
 """
 
+def target_words(i, n):
+    """Giris kisa, kapanis daha da kisa, orta bolumler tam uzunlukta."""
+    return 260 if i == 1 else 180 if i == n else 340
+
+
 VISUAL_TYPES = {"photo_historic", "film_archive", "stock_modern", "text_graphic"}
 
 
@@ -277,6 +280,7 @@ def main(index="1", profile_path="config/profile_en.yaml"):
     set_budget(cfg.get("max_calls_per_run", 80))
     models = [cfg["gemini_model"]] + cfg.get(
         "fallback_models", ["gemini-3.1-flash-lite", "gemini-3.6-flash"])
+    writer_models = [cfg.get("writer_model", "gemini-3.5-flash")] + models
 
     custom = os.environ.get("CUSTOM_TOPIC", "").strip()
     if custom:
@@ -291,7 +295,7 @@ def main(index="1", profile_path="config/profile_en.yaml"):
         theme = cfg["theme"]
     print("Secilen konu:", cand["working_title"])
 
-    titles = ask(models, key, TITLES_PROMPT.format(
+    titles = ask(writer_models, key, TITLES_PROMPT.format(
         title=cand["working_title"], angle=cand["angle"], n=16))
     if isinstance(titles, dict):
         titles = next(iter(titles.values()))
@@ -304,7 +308,7 @@ def main(index="1", profile_path="config/profile_en.yaml"):
     material = "\n\n".join(f"### {s['title']}\n{s['text']}" for s in sources)
     material_norm = norm(material)
 
-    outline = ask(models, key, OUTLINE_PROMPT.format(
+    outline = ask(writer_models, key, OUTLINE_PROMPT.format(
         theme=theme, audience=cfg["audience"], minutes=cfg["video_minutes"],
         title=cand["working_title"], angle=cand["angle"],
         n=SECTIONS, m=SECTIONS - 1, material=material),
@@ -312,82 +316,90 @@ def main(index="1", profile_path="config/profile_en.yaml"):
               "hashtags", "thumbnail_text", "sections"])
     outline = clean_outline(outline)
     plan = outline["sections"]
+    n = len(plan)
     headings = [s["heading"] for s in plan]
     title = outline["title_options"][0]
     question = outline["central_question"]
     print("Merkezi soru:", question)
 
-    sections, told, final_results = [], [], []
-    first_counts, revised_sections = {}, []
+    sections, told, final_results, all_edits, repeats = [], [], [], [], []
+    counts = {}
     for i, sec in enumerate(plan, 1):
+        tw = target_words(i, n)
+        min_w = int(tw * 0.7)
         if i == 1:
-            style = ("Open with the vivid scene in your first two sentences, "
-                     "then pose the central question so the viewer must keep watching. "
+            style = ("Open with the vivid scene in your first two sentences, then pose the central "
+                     "question as a direct question so the viewer must keep watching. "
                      "Do not summarize the story that follows.")
-        elif i == len(plan):
+        elif i == n:
             style = ("Do not recap names or events. Answer the central question directly in two or three "
                      "sentences, give one memorable takeaway, then a short natural sign-off. "
                      "Do not ask for likes or subscriptions.")
         else:
             style = ("Start with one natural sentence that connects to the previous section, "
                      "then move the story forward without repeating it.")
-        reserved = "\n".join(
-            f"[{j}] {s['heading']}: " + "; ".join(s["key_points"])
-            for j, s in enumerate(plan, 1) if j != i) or "(none)"
-        so_far = "\n\n".join(f"[{j}] {t}" for j, t in enumerate(told, 1)) or \
-                 "(nothing yet, this is the first section)"
-        out = ask(models, key, SECTION_PROMPT.format(
+        if i == n:
+            so_far = ("\n".join(f"[{j}] {h}" for j, h in enumerate(headings[:-1], 1)) +
+                      "\n(Only the section titles are shown. Do not recap these topics.)")
+            reserved = "(none)"
+        else:
+            so_far = "\n\n".join(f"[{j}] {t}" for j, t in enumerate(told, 1)) or \
+                     "(nothing yet, this is the first section)"
+            reserved = "\n".join(
+                f"[{j}] {s['heading']}: " + "; ".join(s["key_points"])
+                for j, s in enumerate(plan, 1) if j != i) or "(none)"
+        out = ask(writer_models, key, SECTION_PROMPT.format(
             theme=theme, title=title, question=question,
-            outline=json.dumps(headings), i=i, n=len(plan), heading=sec["heading"],
+            outline=json.dumps(headings), i=i, n=n, heading=sec["heading"],
             purpose=sec.get("purpose", ""), points=json.dumps(sec["key_points"]),
-            so_far=so_far, reserved=reserved, words=TARGET_WORDS,
-            max_words=int(TARGET_WORDS * 1.4), style=style, material=material),
+            so_far=so_far, reserved=reserved, words=tw,
+            max_words=int(tw * 1.4), style=style, material=material),
             need=["narration", "visuals"])
-        narration = txt(out["narration"])
+        narration, dropped = drop_repeats(txt(out["narration"]), told)
+        if dropped:
+            repeats += [{"section": i, "sentence": d} for d in dropped]
+            print(f"Bolum {i}: {len(dropped)} tekrar eden cumle silindi")
         wc = len(narration.split())
-        if wc < MIN_WORDS:
+        if wc < min_w:
             print(f"Bolum {i}: {wc} kelime cok kisa, genisletiliyor...")
             time.sleep(SLEEP_BETWEEN)
-            more = ask(models, key, EXPAND_PROMPT.format(
-                words=TARGET_WORDS, heading=sec["heading"], so_far=so_far,
+            more = ask(writer_models, key, EXPAND_PROMPT.format(
+                words=tw, heading=sec["heading"], so_far=so_far,
                 narration=narration, material=material), need=["narration"])
-            if len(txt(more["narration"]).split()) > wc:
-                narration = txt(more["narration"])
+            new, dropped2 = drop_repeats(txt(more["narration"]), told)
+            repeats += [{"section": i, "sentence": d} for d in dropped2]
+            if len(new.split()) > wc:
+                narration = new
+        if i == 1 and "?" not in narration[-300:]:
+            narration = narration.rstrip() + " " + question
         time.sleep(SLEEP_BETWEEN)
 
         results = verify_section(models, key, narration, material, material_norm)
-        for r in results:
-            first_counts[r["status"]] = first_counts.get(r["status"], 0) + 1
-        issues = [r for r in results if r["status"] in BLOCKING]
-        if issues:
-            print(f"Bolum {i}: {len(issues)} sorunlu iddia, duzeltiliyor...")
-            time.sleep(SLEEP_BETWEEN)
-            new = revise_section(models, key, sec["heading"], so_far, narration, issues, material)
-            if len(new.split()) >= 0.6 * len(narration.split()):
-                narration = new
-                revised_sections.append(i)
-                time.sleep(SLEEP_BETWEEN)
-                results = verify_section(models, key, narration, material, material_norm)
+        narration, edits = apply_edits(narration, results, material_norm)
+        for e in edits:
+            e["section"] = i
+        all_edits += edits
         for r in results:
             r["section"] = i
+            r["auto_edited"] = any(e["claim"] == r["claim"] and e["applied"] for e in edits)
+            counts[r["status"]] = counts.get(r["status"], 0) + 1
         final_results += results
-        left = [r for r in results if r["status"] != "supported"]
-        print(f"Bolum {i}/{len(plan)}: {len(narration.split())} kelime, "
-              f"{len(results)} iddia, {len(left)} supheli kaldi")
+        left = [r for r in results if r["status"] != "supported" and not r["auto_edited"]]
+        print(f"Bolum {i}/{n}: {len(narration.split())} kelime, {len(results)} iddia, "
+              f"{len(edits)} otomatik duzenleme, {len(left)} elle kontrol")
         sections.append({"heading": sec["heading"], "narration": narration,
                          "visuals": normalize_visuals(out["visuals"])})
         told.append(narration)
         time.sleep(SLEEP_BETWEEN)
 
     words = sum(len(s["narration"].split()) for s in sections)
-    final_counts = {}
-    for r in final_results:
-        final_counts[r["status"]] = final_counts.get(r["status"], 0) + 1
-    flagged = [r for r in final_results if r["status"] != "supported"]
+    flagged = [r for r in final_results if r["status"] != "supported" and not r["auto_edited"]]
     src_lines = "\n".join(f"- {s['title']} (Wikipedia): {s['url']}" for s in sources)
     description = (outline["description"].strip() + "\n\nSources:\n" + src_lines +
                    "\n\n" + " ".join(outline["hashtags"]))
     usage = summary()
+    outline_out = [{"heading": s["heading"], "purpose": s["purpose"], "key_points": s["key_points"]}
+                   for s in plan]
     result = {
         "generated": datetime.date.today().isoformat(),
         "topic": cand["working_title"],
@@ -399,9 +411,10 @@ def main(index="1", profile_path="config/profile_en.yaml"):
         "total_words": words,
         "estimated_minutes": round(words / 150, 1),
         "sections": sections,
+        "outline": outline_out,
         "sources": [{"title": s["title"], "url": s["url"]} for s in sources],
-        "verification": {"first_pass_counts": first_counts, "final_counts": final_counts,
-                         "revised_sections": revised_sections, "flagged": flagged},
+        "verification": {"counts": counts, "auto_edits": all_edits,
+                         "repeats_removed": repeats, "flagged": flagged},
         "gemini_usage": usage,
     }
     os.makedirs("data", exist_ok=True)
@@ -420,23 +433,34 @@ def main(index="1", profile_path="config/profile_en.yaml"):
         md += [f"## {i}. {s['heading']}", "", s["narration"], "",
                "*Visuals:* " + "; ".join(f"[{v['type']}] {v['query']}" for v in s["visuals"]), ""]
     md += ["## Verification report", "",
-           f"First pass: {fmt(first_counts)}",
-           f"After revision: {fmt(final_counts)}",
-           f"Sections revised automatically: {revised_sections or 'none'}", "",
-           "Items below were not confirmed by the sources. Check them by hand before publishing:", ""]
+           f"Claims checked: {len(final_results)} ({fmt(counts)})",
+           f"Automatic edits: {len(all_edits)}",
+           f"Repeated sentences removed: {len(repeats)}", ""]
+    if all_edits:
+        md.append("Automatic edits made:")
+        for e in all_edits:
+            what = f"replaced with: {e['replacement']}" if e["replacement"] else "removed"
+            md.append(f"- (Section {e['section']}) [{e['status']}, {what if e['applied'] else 'NOT applied'}] {e['claim']}")
+        md.append("")
+    md += ["Not confirmed by the sources (check by hand before publishing):", ""]
     if not flagged:
-        md += ["- none", ""]
+        md.append("- none")
     for r in flagged:
         line = f"- (Section {r['section']}) [{r['status']}] {r['claim']}"
-        if r["fix"]:
+        if r["fix"] and r["fix"].upper() != "REMOVE":
             line += f"  -> suggested: {r['fix']}"
         if r["evidence"]:
             line += f'  (source: "{r["evidence"]}")'
         md.append(line)
+    md += ["", "## Outline used", ""]
+    for i, o in enumerate(outline_out, 1):
+        md.append(f"{i}. {o['heading']} - {o['purpose']}")
+        md += [f"   - {k}" for k in o["key_points"]]
     with open("data/script.md", "w", encoding="utf-8") as f:
         f.write("\n".join(md))
     print(f"Tamam: {words} kelime, yaklasik {result['estimated_minutes']} dakika, "
-          f"{usage['calls']} Gemini cagrisi, dogrulama (ilk/son): {first_counts} / {final_counts}")
+          f"{usage['calls']} Gemini cagrisi, dogrulama: {counts}, "
+          f"{len(all_edits)} duzenleme, {len(repeats)} tekrar silindi")
 
 
 if __name__ == "__main__":
