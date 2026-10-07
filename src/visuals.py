@@ -66,6 +66,42 @@ def query_variants(q):
     return res
 
 
+STOP = {"the", "and", "for", "with", "from", "that", "this", "view", "scene", "building", "room", "office",
+        "computer", "computers", "machine", "equipment", "lab", "laboratory", "hardware", "system", "network",
+        "terminal", "early", "first", "modern", "close", "campus", "headquarters", "interior", "exterior", "aerial"}
+
+
+def distinctive(q):
+    out = []
+    for t in re.findall(r"[A-Za-z0-9][A-Za-z0-9\-/]*", q):
+        if len(t) < 3 or t.lower() in STOP or GENERIC.match(t):
+            continue
+        out.append(t)
+    return out
+
+
+def _flat(s):
+    return " " + re.sub(r"[^a-z0-9]+", " ", s.lower()).strip() + " "
+
+
+def relevance(q, text, strict):
+    """Sorgudaki ayirt edici kelimeler dosya adi/aciklama/kategoride geciyor mu?
+    strict: kisaltmalar (UCLA, ARPA) ve model numaralari (Q-32) zorunlu, kelimelerin %60'i gerekli."""
+    toks = distinctive(q)
+    if not toks:
+        return True
+    t = _flat(text)
+    has = lambda tok: _flat(tok) in t
+    score = sum(1 for tok in toks if has(tok)) / len(toks)
+    if strict:
+        must = [tok for tok in toks if (tok.isupper() and len(tok) >= 3) or
+                (re.search(r"\d", tok) and not re.fullmatch(r"\d{4}", tok))]
+        if any(not has(m) for m in must):
+            return False
+        return score >= 0.6
+    return score >= 0.5
+
+
 def license_ok(lic, allow_sharealike=True):
     if not lic or DENY.search(lic):
         return False
@@ -93,6 +129,9 @@ def parse_commons_page(pg, allow_sa):
         strip_html((md.get("Credit") or {}).get("value", ""))
     title = pg.get("title", "").replace("File:", "")
     page_url = ii.get("descriptionurl", "")
+    text = " ".join([title.rsplit(".", 1)[0], strip_html((md.get("ImageDescription") or {}).get("value", "")),
+                     strip_html((md.get("ObjectName") or {}).get("value", "")),
+                     strip_html((md.get("Categories") or {}).get("value", "")).replace("|", " ")])
     needs = not PD.search(lic)
     attribution = f'"{title}"' + (f" by {artist[:100]}" if artist and needs else "") + \
                   f" ({lic}), Wikimedia Commons: {page_url}"
@@ -100,7 +139,7 @@ def parse_commons_page(pg, allow_sa):
             "original_url": ii.get("url"), "page_url": page_url,
             "width": ii.get("thumbwidth") or w, "height": ii.get("thumbheight") or h,
             "title": title, "author": artist[:120], "license": lic,
-            "attribution_required": needs, "attribution": attribution}
+            "attribution_required": needs, "attribution": attribution, "_text": text}
 
 
 def commons_search(q, allow_sa, want):
@@ -111,12 +150,12 @@ def commons_search(q, allow_sa, want):
                 "action": "query", "format": "json", "generator": "search",
                 "gsrsearch": variant + suffix, "gsrnamespace": 6, "gsrlimit": 20,
                 "prop": "imageinfo", "iiprop": "url|size|mime|extmetadata", "iiurlwidth": 1920,
-                "iiextmetadatafilter": "LicenseShortName|Artist|Credit"}, UA)
+                "iiextmetadatafilter": "LicenseShortName|Artist|Credit|ImageDescription|ObjectName|Categories"}, UA)
             time.sleep(0.4)
             pages = ((data or {}).get("query") or {}).get("pages") or {}
             for pg in sorted(pages.values(), key=lambda p: p.get("index", 999)):
                 c = parse_commons_page(pg, allow_sa)
-                if c and c["title"] not in seen:
+                if c and relevance(q, c["_text"], strict=True) and c["title"] not in seen:
                     seen.add(c["title"])
                     cands.append(c)
             if pages:
@@ -125,6 +164,49 @@ def commons_search(q, allow_sa, want):
             break
     cands.sort(key=lambda c: 0 if max(c["width"], c["height"]) >= 1280 else 1)
     return cands
+
+
+WIKI = "https://en.wikipedia.org/w/api.php"
+
+
+def build_pool(source_titles, allow_sa):
+    """Senaryonun kaynak makalelerinde kullanilan, Commons'ta lisansi uygun gorselleri toplar."""
+    files = []
+    for t in source_titles:
+        data = get_json(WIKI, {"action": "query", "format": "json", "titles": t, "prop": "images",
+                               "imlimit": "max"}, UA)
+        time.sleep(0.3)
+        for pg in (((data or {}).get("query") or {}).get("pages") or {}).values():
+            for im in pg.get("images", []):
+                n = im.get("title", "")
+                if n and n not in files and re.search(r"\.(jpe?g|png)$", n, re.I):
+                    files.append(n)
+    pool, seen = [], set()
+    for i in range(0, len(files), 40):
+        data = get_json(COMMONS, {
+            "action": "query", "format": "json", "titles": "|".join(files[i:i + 40]),
+            "prop": "imageinfo", "iiprop": "url|size|mime|extmetadata", "iiurlwidth": 1920,
+            "iiextmetadatafilter": "LicenseShortName|Artist|Credit|ImageDescription|ObjectName|Categories"}, UA)
+        time.sleep(0.4)
+        for pg in (((data or {}).get("query") or {}).get("pages") or {}).values():
+            c = parse_commons_page(pg, allow_sa)
+            if c and c["title"] not in seen:
+                seen.add(c["title"])
+                c["from_source_article"] = True
+                pool.append(c)
+    print(f"Kaynak makalelerde {len(files)} gorsel, {len(pool)} tanesi Commons'ta ve lisansi uygun")
+    return pool
+
+
+def rank_pool(q, pool):
+    scored = []
+    for c in pool:
+        if relevance(q, c["_text"], strict=False):
+            toks = distinctive(q)
+            sc = sum(1 for t in toks if _flat(t) in _flat(c["_text"])) / max(len(toks), 1)
+            scored.append((sc, max(c["width"], c["height"]), c))
+    scored.sort(key=lambda x: (-x[0], -x[1]))
+    return [c for _, _, c in scored]
 
 
 # ------------------------------------------------------------------ Pexels
@@ -204,7 +286,7 @@ def pixabay_photos(q, key):
 
 
 # ------------------------------------------------------------------ secim
-def find(vtype, query, keys, allow_sa, used):
+def find(vtype, query, keys, allow_sa, used, pool=()):
     """Bir gorsel istegi icin en fazla 2-3 aday dondurur. Bulamazsa yazi kartina duser."""
     note = ""
     if vtype == "text_graphic":
@@ -226,12 +308,18 @@ def find(vtype, query, keys, allow_sa, used):
         if vtype == "film_archive":
             note = "archive footage not available automatically; using stills"
         want = PER_QUERY_PHOTO
-        cands = commons_search(query, allow_sa, want)
+        cands = [c for c in rank_pool(query, pool) if c["url"] not in used][:want]
+        if len(cands) < want:
+            cands += commons_search(query, allow_sa, want - len(cands))
     cands = [c for c in cands if c["url"] not in used][:want]
     if not cands:
         return [{"kind": "text", "text": query, "fallback": True}], True, note or "nothing found"
+    cands = [{k: v for k, v in c.items() if k != "_text"} for c in cands]   # havuz nesnelerini bozma
     for c in cands:
         used.add(c["url"])
+    src = sum(1 for c in cands if c.get("from_source_article"))
+    if src:
+        note = (note + "; " if note else "") + f"{src} from the source articles"
     return cands, False, note
 
 
@@ -283,12 +371,15 @@ def main(profile_path="config/profile_en.yaml"):
     print("Stok anahtarlari:", {k: ("var" if v else "yok") for k, v in keys.items()},
           "(anahtar yoksa modern stok gorseller yazi kartina duser)")
 
+    pool = []
+    if any(v["type"] in ("photo_historic", "film_archive") for sec in secs for v in sec.get("visuals", [])):
+        pool = build_pool([src["title"] for src in script.get("sources", [])][:12], allow_sa)
     used, stats, out_secs = set(), {}, []
     for si, sec in enumerate(secs, 1):
         items = []
         for v in sec.get("visuals", []):
             vtype, q = v["type"], v["query"]
-            choices, fallback, note = find(vtype, q, keys, allow_sa, used)
+            choices, fallback, note = find(vtype, q, keys, allow_sa, used, pool)
             s = stats.setdefault(vtype, {"requests": 0, "found": 0, "fallback": 0})
             s["requests"] += 1
             s["fallback" if fallback else "found"] += 1
