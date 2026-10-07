@@ -1,0 +1,44 @@
+name: Make visuals
+on:
+  workflow_dispatch:
+    inputs:
+      sections:
+        description: "How many sections to search images for (2 = quick test, 0 = all sections)"
+        required: false
+        default: "2"
+permissions:
+  contents: write
+jobs:
+  visuals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Find visuals
+        env:
+          LIMIT: ${{ github.event.inputs.sections }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+        run: python -u src/visuals.py config/profile_en.yaml
+      - name: Save preview and lists as downloadable files
+        uses: actions/upload-artifact@v4
+        with:
+          name: visuals
+          path: |
+            out/visuals/preview.html
+            out/visuals/visuals.json
+            out/visuals/credits.txt
+      - name: Commit visuals list (full runs only)
+        if: ${{ github.event.inputs.sections == '0' }}
+        run: |
+          git config user.name "research-bot"
+          git config user.email "bot@users.noreply.github.com"
+          cp out/visuals/visuals.json data/visuals.json
+          cp out/visuals/credits.txt data/credits.txt
+          git add data/visuals.json data/credits.txt
+          git diff --staged --quiet || git commit -m "Visuals list"
+          git push
