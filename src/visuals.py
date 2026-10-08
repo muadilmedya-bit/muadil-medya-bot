@@ -1,11 +1,12 @@
 """Gorsel bulma: data/script.json -> out/visuals/visuals.json + preview.html + credits.txt
 Kaynaklar: Wikimedia Commons (tarihi fotograflar), Pexels (modern stok video ve fotograf).
 Kullanim: python src/visuals.py config/profile_en.yaml
-Ortam degiskenleri: LIMIT (kac bolum, 0 = hepsi), PEXELS_API_KEY ve/veya PIXABAY_API_KEY (istege bagli)
+Ortam degiskenleri: LIMIT (kac bolum, 0 = hepsi), GEMINI_API_KEY (gorsel editoru icin), PEXELS_API_KEY ve/veya PIXABAY_API_KEY (istege bagli)
 Bu asamada dosya INDIRILMEZ: sadece secilen gorsellerin adresleri, lisanslari ve onizleme sayfasi uretilir.
 Indirme ve montaj sonraki asamada (render) yapilir."""
 import os, sys, re, json, time, html, datetime
 import requests, yaml
+from llm import ask, set_budget, summary
 
 UA = {"User-Agent": "weekly-video-bot/0.4 (educational video research; "
                     "https://github.com/muadilmedya-bit/muadil-medya-bot)"}
@@ -15,6 +16,7 @@ PEXELS_PHOTO = "https://api.pexels.com/v1/search"
 PIXABAY_PHOTO = "https://pixabay.com/api/"
 PIXABAY_VIDEO = "https://pixabay.com/api/videos/"
 PER_QUERY_PHOTO = 3
+JUDGE_CANDS = 6        # editore (yapay zekaya) sunulacak en fazla aday sayisi
 PER_QUERY_VIDEO = 2
 PEXELS_CREDIT = "Stock video and photos provided by Pexels: https://www.pexels.com"
 
@@ -102,6 +104,19 @@ def relevance(q, text, strict):
     return score >= 0.5
 
 
+def query_era(q):
+    ys = [int(y) for y in re.findall(r"\b(1[5-9]\d\d|20[0-3]\d)\b", q)]
+    for d in re.findall(r"\b(1[5-9]\d0|20[0-3]0)s\b", q):
+        ys += [int(d), int(d) + 9]
+    return (min(ys), max(ys)) if ys else None
+
+
+def era_ok(q, year):
+    """Sorgu bir donem belirtiyorsa, cok daha sonraki tarihli (modern) fotograflari ele."""
+    era = query_era(q)
+    return not (era and year and year > era[1] + 25)
+
+
 def license_ok(lic, allow_sharealike=True):
     if not lic or DENY.search(lic):
         return False
@@ -132,6 +147,9 @@ def parse_commons_page(pg, allow_sa):
     text = " ".join([title.rsplit(".", 1)[0], strip_html((md.get("ImageDescription") or {}).get("value", "")),
                      strip_html((md.get("ObjectName") or {}).get("value", "")),
                      strip_html((md.get("Categories") or {}).get("value", "")).replace("|", " ")])
+    date_raw = strip_html((md.get("DateTimeOriginal") or {}).get("value", "") or
+                          (md.get("DateTime") or {}).get("value", ""))
+    ym = re.search(r"\b(1[5-9]\d\d|20[0-4]\d)\b", date_raw)
     needs = not PD.search(lic)
     attribution = f'"{title}"' + (f" by {artist[:100]}" if artist and needs else "") + \
                   f" ({lic}), Wikimedia Commons: {page_url}"
@@ -139,7 +157,10 @@ def parse_commons_page(pg, allow_sa):
             "original_url": ii.get("url"), "page_url": page_url,
             "width": ii.get("thumbwidth") or w, "height": ii.get("thumbheight") or h,
             "title": title, "author": artist[:120], "license": lic,
-            "attribution_required": needs, "attribution": attribution, "_text": text}
+            "attribution_required": needs, "attribution": attribution, "_text": text,
+            "year": int(ym.group(1)) if ym else None,
+            "desc": strip_html((md.get("ImageDescription") or {}).get("value", ""))[:240],
+            "cats": strip_html((md.get("Categories") or {}).get("value", "")).replace("|", "; ")[:200]}
 
 
 def commons_search(q, allow_sa, want):
@@ -150,12 +171,13 @@ def commons_search(q, allow_sa, want):
                 "action": "query", "format": "json", "generator": "search",
                 "gsrsearch": variant + suffix, "gsrnamespace": 6, "gsrlimit": 20,
                 "prop": "imageinfo", "iiprop": "url|size|mime|extmetadata", "iiurlwidth": 1920,
-                "iiextmetadatafilter": "LicenseShortName|Artist|Credit|ImageDescription|ObjectName|Categories"}, UA)
+                "iiextmetadatafilter": "LicenseShortName|Artist|Credit|ImageDescription|ObjectName|Categories|DateTimeOriginal|DateTime"}, UA)
             time.sleep(0.4)
             pages = ((data or {}).get("query") or {}).get("pages") or {}
             for pg in sorted(pages.values(), key=lambda p: p.get("index", 999)):
                 c = parse_commons_page(pg, allow_sa)
-                if c and relevance(q, c["_text"], strict=True) and c["title"] not in seen:
+                if c and era_ok(q, c.get("year")) and relevance(q, c["_text"], strict=True) \
+                        and c["title"] not in seen:
                     seen.add(c["title"])
                     cands.append(c)
             if pages:
@@ -171,7 +193,7 @@ WIKI = "https://en.wikipedia.org/w/api.php"
 
 def build_pool(source_titles, allow_sa):
     """Senaryonun kaynak makalelerinde kullanilan, Commons'ta lisansi uygun gorselleri toplar."""
-    files = []
+    files = {}
     for t in source_titles:
         data = get_json(WIKI, {"action": "query", "format": "json", "titles": t, "prop": "images",
                                "imlimit": "max"}, UA)
@@ -179,29 +201,31 @@ def build_pool(source_titles, allow_sa):
         for pg in (((data or {}).get("query") or {}).get("pages") or {}).values():
             for im in pg.get("images", []):
                 n = im.get("title", "")
-                if n and n not in files and re.search(r"\.(jpe?g|png)$", n, re.I):
-                    files.append(n)
+                if n and re.search(r"\.(jpe?g|png)$", n, re.I):
+                    files.setdefault(n, t)
+    names = list(files)
     pool, seen = [], set()
-    for i in range(0, len(files), 40):
+    for i in range(0, len(names), 40):
         data = get_json(COMMONS, {
-            "action": "query", "format": "json", "titles": "|".join(files[i:i + 40]),
+            "action": "query", "format": "json", "titles": "|".join(names[i:i + 40]),
             "prop": "imageinfo", "iiprop": "url|size|mime|extmetadata", "iiurlwidth": 1920,
-            "iiextmetadatafilter": "LicenseShortName|Artist|Credit|ImageDescription|ObjectName|Categories"}, UA)
+            "iiextmetadatafilter": "LicenseShortName|Artist|Credit|ImageDescription|ObjectName|Categories|DateTimeOriginal|DateTime"}, UA)
         time.sleep(0.4)
         for pg in (((data or {}).get("query") or {}).get("pages") or {}).values():
             c = parse_commons_page(pg, allow_sa)
             if c and c["title"] not in seen:
                 seen.add(c["title"])
                 c["from_source_article"] = True
+                c["article"] = files.get(pg.get("title"), "")
                 pool.append(c)
-    print(f"Kaynak makalelerde {len(files)} gorsel, {len(pool)} tanesi Commons'ta ve lisansi uygun")
+    print(f"Kaynak makalelerde {len(names)} gorsel, {len(pool)} tanesi Commons'ta ve lisansi uygun")
     return pool
 
 
 def rank_pool(q, pool):
     scored = []
     for c in pool:
-        if relevance(q, c["_text"], strict=False):
+        if era_ok(q, c.get("year")) and relevance(q, c["_text"], strict=False):
             toks = distinctive(q)
             sc = sum(1 for t in toks if _flat(t) in _flat(c["_text"])) / max(len(toks), 1)
             scored.append((sc, max(c["width"], c["height"]), c))
@@ -286,41 +310,80 @@ def pixabay_photos(q, key):
 
 
 # ------------------------------------------------------------------ secim
-def find(vtype, query, keys, allow_sa, used, pool=()):
-    """Bir gorsel istegi icin en fazla 2-3 aday dondurur. Bulamazsa yazi kartina duser."""
-    note = ""
-    if vtype == "text_graphic":
-        return [{"kind": "text", "text": query}], False, note
-    if vtype == "stock_modern":
-        if not (keys.get("pexels") or keys.get("pixabay")):
-            return [{"kind": "text", "text": query, "fallback": True}], True, "no stock API key"
-        cands = []
-        if keys.get("pexels"):
-            cands += pexels_videos(query, keys["pexels"])
-        if len(cands) < PER_QUERY_VIDEO and keys.get("pixabay"):
-            cands += pixabay_videos(query, keys["pixabay"])
-        if len(cands) < PER_QUERY_VIDEO and keys.get("pexels"):
-            cands += pexels_photos(query, keys["pexels"])
-        if len(cands) < PER_QUERY_VIDEO and keys.get("pixabay"):
-            cands += pixabay_photos(query, keys["pixabay"])
-        want = PER_QUERY_VIDEO
-    else:
-        if vtype == "film_archive":
-            note = "archive footage not available automatically; using stills"
-        want = PER_QUERY_PHOTO
-        cands = [c for c in rank_pool(query, pool) if c["url"] not in used][:want]
-        if len(cands) < want:
-            cands += commons_search(query, allow_sa, want - len(cands))
-    cands = [c for c in cands if c["url"] not in used][:want]
+def find_stock(query, keys, used):
+    """Modern stok video/foto. Anahtar yoksa ya da bulunamazsa yazi karti."""
+    if not (keys.get("pexels") or keys.get("pixabay")):
+        return [{"kind": "text", "text": query, "fallback": True}], True, "no stock API key"
+    cands = []
+    if keys.get("pexels"):
+        cands += pexels_videos(query, keys["pexels"])
+    if len(cands) < PER_QUERY_VIDEO and keys.get("pixabay"):
+        cands += pixabay_videos(query, keys["pixabay"])
+    if len(cands) < PER_QUERY_VIDEO and keys.get("pexels"):
+        cands += pexels_photos(query, keys["pexels"])
+    if len(cands) < PER_QUERY_VIDEO and keys.get("pixabay"):
+        cands += pixabay_photos(query, keys["pixabay"])
+    cands = [c for c in cands if c["url"] not in used][:PER_QUERY_VIDEO]
     if not cands:
-        return [{"kind": "text", "text": query, "fallback": True}], True, note or "nothing found"
-    cands = [{k: v for k, v in c.items() if k != "_text"} for c in cands]   # havuz nesnelerini bozma
+        return [{"kind": "text", "text": query, "fallback": True}], True, "nothing found"
     for c in cands:
         used.add(c["url"])
-    src = sum(1 for c in cands if c.get("from_source_article"))
-    if src:
-        note = (note + "; " if note else "") + f"{src} from the source articles"
-    return cands, False, note
+    return cands, False, ""
+
+
+def historic_candidates(query, allow_sa, pool):
+    """Tarihi fotograf adaylari: once kaynak makalelerin gorselleri, sonra Commons aramasi."""
+    cands = rank_pool(query, pool)[:4]
+    if len(cands) < 4:
+        have = {c["url"] for c in cands}
+        cands += [c for c in commons_search(query, allow_sa, JUDGE_CANDS - len(cands)) if c["url"] not in have]
+    return cands[:JUDGE_CANDS]
+
+
+JUDGE_PROMPT = """You are the visual editor of a documentary YouTube channel about {theme}.
+Video topic: {topic}
+Section {i}: "{heading}". The narrator says:
+{narration}
+
+Below are image requests for this section. For every request, candidate images are listed with METADATA ONLY
+(file title, year, the Wikipedia article they were taken from, description, categories).
+
+Accept a candidate only if its metadata clearly shows that it depicts the requested subject in a way that
+fits this section:
+- Right person: not a namesake (an athlete, actor, painter or relative with the same name is NOT acceptable).
+- Right place or object, and a plausible era. If the request names a period, a modern photo is NOT acceptable.
+- The image must illustrate the story being told. Photos of protests, attacks, disasters or other unrelated
+  events at the same place are NOT acceptable, even if they show the same building.
+- An image taken from the Wikipedia article about the requested subject is a strong positive sign.
+When in doubt, reject. Rejecting every candidate is fine: a text card will be shown instead.
+
+Return ONLY a JSON object: {{"decisions": [{{"id": <request number>, "accept": [<candidate numbers, best first>],
+"reason": "<one short sentence>"}}]}}
+
+{requests}
+"""
+
+
+def judge_section(models, key, theme, topic, i, heading, narration, pending):
+    lines = []
+    for n, it in enumerate(pending, 1):
+        lines.append(f'REQUEST {n}: type={it["type"]}  query="{it["query"]}"')
+        for j, c in enumerate(it["_cands"], 1):
+            lines.append(f'  [{j}] title: {c["title"]} | year: {c.get("year") or "unknown"} | '
+                         f'article: {c.get("article") or "-"} | description: {c.get("desc", "")[:200]} | '
+                         f'categories: {c.get("cats", "")[:150]}')
+    out = ask(models, key, JUDGE_PROMPT.format(theme=theme, topic=topic, i=i, heading=heading,
+                                               narration=narration[:1800], requests="\n".join(lines)),
+              need=["decisions"], temperature=0.1)
+    res = {}
+    for d in out["decisions"]:
+        try:
+            n = int(d["id"])
+            acc = [int(x) for x in d.get("accept", [])]
+        except (KeyError, ValueError, TypeError, AttributeError):
+            continue
+        res[n] = (acc, str(d.get("reason", ""))[:160])
+    return res
 
 
 def preview_html(data):
@@ -365,31 +428,74 @@ def main(profile_path="config/profile_en.yaml"):
     allow_sa = vis_cfg.get("allow_sharealike", True)
     keys = {"pexels": os.environ.get("PEXELS_API_KEY", "").strip(),
             "pixabay": os.environ.get("PIXABAY_API_KEY", "").strip()}
+    gem_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    set_budget(vis_cfg.get("max_calls", 40))
+    models = [cfg["gemini_model"]] + cfg.get("fallback_models", ["gemini-3.1-flash-lite", "gemini-3.6-flash"])
+    judge_models = [cfg.get("writer_model", "gemini-3.5-flash")] + models
+    theme = cfg.get("custom_theme", "the history of technology")
     script = json.load(open("data/script.json", encoding="utf-8"))
     limit = int(os.environ.get("LIMIT", "0") or 0)
     secs = script["sections"][:limit] if limit else script["sections"]
     print("Stok anahtarlari:", {k: ("var" if v else "yok") for k, v in keys.items()},
-          "(anahtar yoksa modern stok gorseller yazi kartina duser)")
+          "| gorsel editoru (Gemini):", "var" if gem_key else "YOK (sadece kural tabanli filtre)")
 
     pool = []
     if any(v["type"] in ("photo_historic", "film_archive") for sec in secs for v in sec.get("visuals", [])):
         pool = build_pool([src["title"] for src in script.get("sources", [])][:12], allow_sa)
     used, stats, out_secs = set(), {}, []
     for si, sec in enumerate(secs, 1):
-        items = []
+        items, pending = [], []
         for v in sec.get("visuals", []):
             vtype, q = v["type"], v["query"]
-            choices, fallback, note = find(vtype, q, keys, allow_sa, used, pool)
-            s = stats.setdefault(vtype, {"requests": 0, "found": 0, "fallback": 0})
-            s["requests"] += 1
-            s["fallback" if fallback else "found"] += 1
-            items.append({"type": vtype, "query": q, "fallback": fallback, "note": note, "choices": choices})
+            it = {"type": vtype, "query": q, "fallback": False, "note": "", "choices": []}
+            if vtype == "text_graphic":
+                it["choices"] = [{"kind": "text", "text": q}]
+            elif vtype == "stock_modern":
+                it["choices"], it["fallback"], it["note"] = find_stock(q, keys, used)
+            else:
+                if vtype == "film_archive":
+                    it["note"] = "archive footage not available automatically; using stills"
+                it["_cands"] = historic_candidates(q, allow_sa, pool)
+                pending.append(it)
+            items.append(it)
+
+        decisions = {}
+        with_cands = [it for it in pending if it["_cands"]]
+        if with_cands and gem_key:
+            try:
+                decisions = judge_section(judge_models, gem_key, theme, script.get("topic", ""), si,
+                                          sec["heading"], sec.get("narration", ""), with_cands)
+            except SystemExit as e:
+                print(f"  Gorsel editoru calismadi ({e}); kural tabanli filtre kullaniliyor")
+        for n, it in enumerate(with_cands, 1):
+            cands = it.pop("_cands")
+            if gem_key and decisions:
+                acc, reason = decisions.get(n, ([], "no decision"))
+                picked = [cands[k - 1] for k in acc if 1 <= k <= len(cands)]
+                it["note"] = (it["note"] + "; " if it["note"] else "") + f"editor kept {len(picked)}/{len(cands)}: {reason}"
+            else:
+                picked = cands
+                it["note"] = (it["note"] + "; " if it["note"] else "") + "unjudged"
+            picked = [c for c in picked if c["url"] not in used][:PER_QUERY_PHOTO]
+            picked = [{k: v for k, v in c.items() if k != "_text"} for c in picked]
+            for c in picked:
+                used.add(c["url"])
+            it["choices"] = picked
+        for it in pending:
+            it.pop("_cands", None)
+            if not it["choices"]:
+                it["choices"] = [{"kind": "text", "text": it["query"], "fallback": True}]
+                it["fallback"] = True
+        for it in items:
+            s_ = stats.setdefault(it["type"], {"requests": 0, "found": 0, "fallback": 0})
+            s_["requests"] += 1
+            s_["fallback" if it["fallback"] else "found"] += 1
         out_secs.append({"index": si, "heading": sec["heading"], "items": items})
         nf = sum(1 for i in items if i["fallback"])
         print(f"Bolum {si}/{len(secs)}: {len(items)} istek, {len(items) - nf} bulundu, {nf} yazi karti")
 
     data = {"generated": datetime.date.today().isoformat(), "topic": script.get("topic", ""),
-            "pexels_credit": PEXELS_CREDIT, "stats": stats, "sections": out_secs}
+            "pexels_credit": PEXELS_CREDIT, "stats": stats, "gemini_usage": summary(), "sections": out_secs}
     out = "out/visuals"
     os.makedirs(out, exist_ok=True)
     json.dump(data, open(f"{out}/visuals.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)
