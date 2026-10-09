@@ -431,7 +431,7 @@ def main(profile_path="config/profile_en.yaml"):
     gem_key = os.environ.get("GEMINI_API_KEY", "").strip()
     set_budget(vis_cfg.get("max_calls", 40))
     models = [cfg["gemini_model"]] + cfg.get("fallback_models", ["gemini-3.1-flash-lite", "gemini-3.6-flash"])
-    judge_models = [cfg.get("writer_model", "gemini-3.5-flash")] + models
+    judge_models = list(models)  # hizli lite model once; buyuk flash surekli 503 verip zaman kaybettiriyor
     theme = cfg.get("custom_theme", "the history of technology")
     script = json.load(open("data/script.json", encoding="utf-8"))
     limit = int(os.environ.get("LIMIT", "0") or 0)
