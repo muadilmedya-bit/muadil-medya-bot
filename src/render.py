@@ -118,30 +118,28 @@ print("islenecek bolum:", len(secs))
 # ---------- gorsel ogeleri ----------
 URL_KEYS = ("url", "image_url", "file_url", "src", "download_url", "image", "file", "path")
 def items_of(sec):
+    """visuals.json: sections[].items[].choices[] -> duz liste (sirayla)."""
+    out = []
     if not isinstance(sec, dict):
-        return []
-    for k in ("items", "visuals", "shots", "media", "slides", "picks", "images", "chosen", "selected"):
-        v = sec.get(k)
-        if isinstance(v, list) and v and isinstance(v[0], (dict, str)):
-            return [x if isinstance(x, dict) else {"url": x} for x in v]
-    return []
+        return out
+    for it in sec.get("items") or []:
+        if not isinstance(it, dict):
+            continue
+        for c in it.get("choices") or []:
+            if isinstance(c, dict):
+                c = dict(c); c.setdefault("query", it.get("query", "")); out.append(c)
+    return out
 
-def classify(it):
-    url = ""
-    for k in URL_KEYS:
-        if isinstance(it.get(k), str) and it[k].strip():
-            url = it[k].strip(); break
-    for k in ("video_url", "video", "mp4"):
-        if isinstance(it.get(k), str) and it[k].strip():
-            return "video", it[k].strip(), it
-    kind = " ".join(str(it.get(k, "")) for k in ("kind", "type", "media_type", "tag", "visual_type")).lower()
-    if "text_graphic" in kind or "text" in kind and not url:
-        return "card", "", it
-    if re.search(r"\.(mp4|webm|mov)(\?|$)", url, re.I) or "video" in kind and url:
-        return "video", url, it
-    if url:
-        return "image", url, it
-    return "card", "", it
+def classify(c):
+    kind = str(c.get("kind", "")).lower()
+    url = str(c.get("url") or "").strip()
+    if kind == "text" or not url:
+        if c.get("fallback"):
+            return "skip", "", c          # bulunamayan gorsel: yazi karti gostermiyoruz
+        return "card", "", c              # bilerek istenen yazi grafigi
+    if kind == "video" or re.search(r"\.(mp4|webm|mov)(\?|$)", url, re.I):
+        return "video", url, c
+    return "image", url, c
 
 def fetch(url, n):
     if os.path.exists(url):
@@ -220,9 +218,12 @@ def add(kind, d, fn):
 
 for si, (s0, s1) in enumerate(secs):
     D = max(s1 - s0, 0.5)
-    sec = vis[si] if si < len(vis) else {}
+    sec = next((v for v in vis if isinstance(v, dict) and v.get("index") == si + 1), None)
+    if sec is None:
+        sec = vis[si] if si < len(vis) else {}
     title = title_of(tim[si] if si < len(tim) else {}, si)
     items = [classify(x) for x in items_of(sec)]
+    items = [x for x in items if x[0] != "skip"]
     print(f"[{si+1}/{len(secs)}] {title[:50]} | {D:.1f} sn | {len(items)} oge")
     plan = []  # (tur, sure, fn)
     used = 0.0
@@ -237,7 +238,8 @@ for si, (s0, s1) in enumerate(secs):
         rem = D - used
         if media_ok:
             kind, url, it = media_ok[k % len(media_ok)]; k += 1
-            base = min(VID_MAX, 8.0) if kind == "video" else IMG_SEC
+            nm = max(len(media_ok), 1)
+            base = VID_MAX if kind == "video" else min(max((D - chd) / nm, IMG_SEC), 12.0)
             d = rem if rem < base * 1.4 else base
             try:
                 mcount += 1
