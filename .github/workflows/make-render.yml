@@ -1,0 +1,68 @@
+name: Make render
+
+on:
+  workflow_dispatch:
+    inputs:
+      sections:
+        description: "Kac bolum (0 = hepsi)"
+        default: "2"
+      quality:
+        description: "preview (hizli, kucuk) veya final (1080p)"
+        default: "preview"
+      subs:
+        description: "burn (altyazi gomulu) veya none"
+        default: "burn"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          pip install requests
+      - name: Get latest voice and visuals from earlier runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p out/voice out/visuals dl
+          fetch() {
+            wf="$1"; art="$2"
+            id=$(gh run list --workflow "$wf" --status success --limit 1 --json databaseId --jq '.[0].databaseId' || true)
+            echo "$wf -> run $id"
+            if [ -n "$id" ]; then
+              gh run download "$id" -n "$art" -D "dl/$art" || echo "indirilemedi: $art"
+            fi
+          }
+          fetch make-voice.yml voice
+          fetch make-visuals.yml visuals
+          find dl -type f | head -50
+          for f in narration.mp3 timings.json subtitles.srt; do
+            p=$(find dl/voice -name "$f" | head -1); [ -n "$p" ] && cp "$p" out/voice/ || true
+          done
+          for f in visuals.json credits.txt; do
+            p=$(find dl/visuals -name "$f" | head -1); [ -n "$p" ] && cp "$p" out/visuals/ || true
+          done
+          ls -la out/voice out/visuals
+      - name: Render
+        env:
+          LIMIT: ${{ github.event.inputs.sections }}
+          QUALITY: ${{ github.event.inputs.quality }}
+          SUBS: ${{ github.event.inputs.subs }}
+        run: python -u src/render.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: video
+          path: |
+            out/video/video.mp4
+            out/video/render_report.json
