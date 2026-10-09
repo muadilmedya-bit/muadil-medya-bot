@@ -1,0 +1,1588 @@
+{
+  "generated": "2026-10-09",
+  "topic": "The story of ARPANET: was the Internet really built to survive a nuclear war?",
+  "pexels_credit": "Stock video and photos provided by Pexels: https://www.pexels.com",
+  "stats": {
+    "photo_historic": {
+      "requests": 57,
+      "found": 10,
+      "fallback": 47
+    },
+    "film_archive": {
+      "requests": 8,
+      "found": 1,
+      "fallback": 7
+    },
+    "text_graphic": {
+      "requests": 17,
+      "found": 17,
+      "fallback": 0
+    },
+    "stock_modern": {
+      "requests": 6,
+      "found": 6,
+      "fallback": 0
+    }
+  },
+  "gemini_usage": {
+    "calls": 11,
+    "by_model": {
+      "gemini-3.5-flash-lite": 11
+    }
+  },
+  "sections": [
+    {
+      "index": 1,
+      "heading": "The Office with Three Terminals",
+      "items": [
+        {
+          "type": "photo_historic",
+          "query": "Pentagon building 1960s aerial view",
+          "fallback": false,
+          "note": "editor kept 2/3: Aerial photographs of the Pentagon from the appropriate era (1970 and 1974) effectively illustrate the location.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/2/29/Arlington_-_Pentagon_from_Air.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/2/29/Arlington_-_Pentagon_from_Air.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:Arlington_-_Pentagon_from_Air.jpg",
+              "width": 1920,
+              "height": 1160,
+              "title": "Arlington - Pentagon from Air.jpg",
+              "author": "roger4336",
+              "license": "CC BY-SA 2.0",
+              "attribution_required": true,
+              "attribution": "\"Arlington - Pentagon from Air.jpg\" by roger4336 (CC BY-SA 2.0), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Arlington_-_Pentagon_from_Air.jpg",
+              "year": 1970,
+              "desc": "The Pentagon from an airplane that has just taken off from Washington National Airport in January 1970.  The Pentagon is the headquarters of the U.S. Department of Defense.  It was begun in 1941 and completd in 1943.  It was built in sectio",
+              "cats": "Aerial photographs of the Pentagon; Files with coordinates missing SDC location of creation; Flickr images reviewed by FlickreviewR 2; The Pentagon in January 1970; Snow in Virginia in January 1970"
+            },
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Arlington_-_Pentagon_from_the_Air.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Arlington_-_Pentagon_from_the_Air.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:Arlington_-_Pentagon_from_the_Air.jpg",
+              "width": 1920,
+              "height": 1275,
+              "title": "Arlington - Pentagon from the Air.jpg",
+              "author": "roger4336",
+              "license": "CC BY-SA 2.0",
+              "attribution_required": true,
+              "attribution": "\"Arlington - Pentagon from the Air.jpg\" by roger4336 (CC BY-SA 2.0), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Arlington_-_Pentagon_from_the_Air.jpg",
+              "year": 1974,
+              "desc": "The Pentagon, headquarters of the U.S. Department of Defense (DOD) and the largest office building in the world, from an airplane landing at Washington National Airport in 1974.  Shirley Highway (I-395) sweeps around the top left.  The Navy",
+              "cats": "Potomac River; Aerial photographs of the Pentagon; Files with coordinates missing SDC location of creation; Flickr images reviewed by FlickreviewR 2; The Pentagon in August 1974"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Robert Taylor ARPA 1960s portrait",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Robert Taylor ARPA 1960s portrait",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "film_archive",
+          "query": "nuclear bomb test mushroom cloud 1960s archive footage",
+          "fallback": false,
+          "note": "archive footage not available automatically; using stills; editor kept 1/6: Shows a 1960s nuclear test fitting the narrative about the nuclear-proof myth.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Nuclear_test_1962.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Nuclear_test_1962.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:Nuclear_test_1962.jpg",
+              "width": 1920,
+              "height": 1270,
+              "title": "Nuclear test 1962.jpg",
+              "author": "UPI Telephoto",
+              "license": "Public domain",
+              "attribution_required": false,
+              "attribution": "\"Nuclear test 1962.jpg\" (Public domain), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Nuclear_test_1962.jpg",
+              "year": 1962,
+              "desc": "Nuclear test near Las Vegas, Nevada. 100-kiloton bomb buried 650 feet underground. Explosion cloud was 3-5 miles wide and about 15,000 feet high.",
+              "cats": "Sedan (nuclear test); PD US no notice; Black and white photographs of the United States in the 1960s; 1962 black and white photographs; United States photographs taken on 1962-07-06"
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "1966",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "1966"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "System Development Corporation SDC Q-32 mainframe computer",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "System Development Corporation SDC Q-32 mainframe computer",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Project Genie computer Berkeley 1960s",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Project Genie computer Berkeley 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Multics mainframe computer system MIT 1960s",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Multics mainframe computer system MIT 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "stock_modern",
+          "query": "person hands typing on modern laptop close up",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2017/07/23/10822-226624975_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2017/07/23/10822-226624975_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-10822/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 12,
+              "title": "Pixabay video 10822",
+              "author": "Coverr-Free-Footage",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by Coverr-Free-Footage on Pixabay: https://pixabay.com/videos/id-10822/"
+            },
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2020/07/01/43559-436237492_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2020/07/01/43559-436237492_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-43559/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 18,
+              "title": "Pixabay video 43559",
+              "author": "PhotoDhaba",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by PhotoDhaba on Pixabay: https://pixabay.com/videos/id-43559/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "heading": "The Intergalactic Dream",
+      "items": [
+        {
+          "type": "photo_historic",
+          "query": "J C R Licklider",
+          "fallback": true,
+          "note": "editor kept 0/1: No valid historical photos of J.C.R. Licklider from his working era were provided.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "J C R Licklider",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "SAGE air defense computer terminal",
+          "fallback": false,
+          "note": "editor kept 1/6: Shows a SAGE air-defense console at the Computer History Museum.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Larry_Niven_admiring_SAGE_console.jpeg/1920px-Larry_Niven_admiring_SAGE_console.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Larry_Niven_admiring_SAGE_console.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:Larry_Niven_admiring_SAGE_console.jpeg",
+              "width": 1920,
+              "height": 1277,
+              "title": "Larry Niven admiring SAGE console.jpeg",
+              "author": "Roland Dobbins from San Jose, United States",
+              "license": "CC BY-SA 2.0",
+              "attribution_required": true,
+              "attribution": "\"Larry Niven admiring SAGE console.jpeg\" by Roland Dobbins from San Jose, United States (CC BY-SA 2.0), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Larry_Niven_admiring_SAGE_console.jpeg",
+              "year": 2006,
+              "desc": "Larry Niven admires the SAGE (Semi-Automatic Ground Environment) air-defense operator's console, at the Computer History Museum in Mountain View, California.",
+              "cats": "Taken with Canon EOS 20D; 2006 in the United States; Larry Niven; AN/FSQ-7; Flickr images reviewed by FlickreviewR; Flickr images missing SDC creator; Flickr images missing SDC source of file"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Bolt Beranek and Newman office",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Bolt Beranek and Newman office",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "April 1963",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "April 1963"
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "Intergalactic Computer Network",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Intergalactic Computer Network"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Pentagon 1960s",
+          "fallback": true,
+          "note": "editor kept 0/6: The candidates show protests or interior offices unrelated to Licklider's work environment in the Pentagon.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Pentagon 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Ivan Sutherland 1960s",
+          "fallback": true,
+          "note": "editor kept 0/1: No valid historical photo of computer scientist Ivan Sutherland from the 1960s.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Ivan Sutherland 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "AN FSQ 32 computer terminal",
+          "fallback": false,
+          "note": "editor kept 1/3: Depicts a SAGE terminal used during the Cold War.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/SAGE_console.jpeg/1920px-SAGE_console.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/SAGE_console.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:SAGE_console.jpeg",
+              "width": 1920,
+              "height": 1398,
+              "title": "SAGE console.jpeg",
+              "author": "Joi Ito from Inbamura, Japan",
+              "license": "CC BY 2.0",
+              "attribution_required": true,
+              "attribution": "\"SAGE console.jpeg\" by Joi Ito from Inbamura, Japan (CC BY 2.0), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:SAGE_console.jpeg",
+              "year": 2007,
+              "desc": "A SAGE (Semi-Automatic Ground Environment) terminal used during cold war to analyze radar data in real time to target Soviet bombers. The light pen, which was shaped similar to a handheld power drill or gun, is resting on the console. Notic",
+              "cats": "Taken with Leica M8; AN/FSQ-7; Smoking in the United States military; Flickr images reviewed by FlickreviewR; Metal ashtrays; Computer consoles; Radar consoles; Photographs by Jōichi Itō; Computers in",
+              "from_source_article": true,
+              "article": "J. C. R. Licklider"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "heading": "The Cold War Shield",
+      "items": [
+        {
+          "type": "film_archive",
+          "query": "Cold War nuclear missile silo test launch",
+          "fallback": true,
+          "note": "archive footage not available automatically; using stills; editor kept 0/1: The candidate image depicts a specific missile launcher, not a general Cold War nuclear missile silo test launch.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Cold War nuclear missile silo test launch",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Paul Baran engineer portrait 1960",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Paul Baran engineer portrait 1960",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "RAND Corporation headquarters Santa Monica 1960s",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "RAND Corporation headquarters Santa Monica 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "film_archive",
+          "query": "mainframe computer room magnetic tape reels 1960s",
+          "fallback": true,
+          "note": "archive footage not available automatically; using stills; editor kept 0/1: The candidate image shows a supersonic wind tunnel data recording room rather than a general mainframe computer room from the 1960s.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "mainframe computer room magnetic tape reels 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "n >= 3",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "n >= 3"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Paul Baran distributed network diagram RAND 1964",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Paul Baran distributed network diagram RAND 1964",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "AT&T engineers vintage office 1960s",
+          "fallback": true,
+          "note": "editor kept 0/6: None of the candidate images depict AT&T engineers in a vintage office from the 1960s.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "AT&T engineers vintage office 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "film_archive",
+          "query": "government fallout shelter bunker interior cold war",
+          "fallback": true,
+          "note": "archive footage not available automatically; using stills",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "government fallout shelter bunker interior cold war",
+              "fallback": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "heading": "The British Connection",
+      "items": [
+        {
+          "type": "photo_historic",
+          "query": "Donald Davies National Physical Laboratory",
+          "fallback": true,
+          "note": "editor kept 0/6: None of the candidates show Donald Davies or the National Physical Laboratory.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Donald Davies National Physical Laboratory",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Alan Turing Pilot ACE computer",
+          "fallback": true,
+          "note": "editor kept 0/1: The candidate shows museum wreckage, not the Pilot ACE computer.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Alan Turing Pilot ACE computer",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "MIT Project MAC mainframe terminal 1965",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "MIT Project MAC mainframe terminal 1965",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "film_archive",
+          "query": "vintage telephone switching system 1960s",
+          "fallback": true,
+          "note": "archive footage not available automatically; using stills",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "vintage telephone switching system 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "film_archive",
+          "query": "water dripping from tap close up",
+          "fallback": true,
+          "note": "archive footage not available automatically; using stills; editor kept 0/6: None of the candidates show a close-up of a water tap as described in the script.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "water dripping from tap close up",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Donald Davies NPL paper 1966",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Donald Davies NPL paper 1966",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "1966 National Communications Service",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "1966 National Communications Service"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "early ARPANET map nodes",
+          "fallback": true,
+          "note": "editor kept 0/5: These maps show ARPANET nodes, which illustrates the concept of switching nodes mentioned in the text.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "early ARPANET map nodes",
+              "fallback": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "heading": "Sectored Funds and a New Manager",
+      "items": [
+        {
+          "type": "photo_historic",
+          "query": "Donald Davies computer scientist NPL",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Donald Davies computer scientist NPL",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Bob Taylor ARPA office portrait",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Bob Taylor ARPA office portrait",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Charles M Herzfeld ARPA Director",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Charles M Herzfeld ARPA Director",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "$1,000,000",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "$1,000,000"
+            }
+          ]
+        },
+        {
+          "type": "film_archive",
+          "query": "1960s Nike Zeus ballistic missile test launch",
+          "fallback": true,
+          "note": "archive footage not available automatically; using stills; editor kept 0/6: no decision",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "1960s Nike Zeus ballistic missile test launch",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Larry Roberts ARPANET computer scientist",
+          "fallback": true,
+          "note": "editor kept 0/2: No direct portrait of Larry Roberts from the historical period is available in the candidates.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Larry Roberts ARPANET computer scientist",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Paul Baran RAND Corporation portrait",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Paul Baran RAND Corporation portrait",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "mainframe computer room 1967",
+          "fallback": true,
+          "note": "editor kept 0/5: no decision",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "mainframe computer room 1967",
+              "fallback": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "heading": "The Blueprint Changes",
+      "items": [
+        {
+          "type": "photo_historic",
+          "query": "Larry Roberts ARPA 1960s",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Larry Roberts ARPA 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "IBM System 360 mainframe computer 1960s",
+          "fallback": false,
+          "note": "editor kept 3/5: The candidates show IBM System/360 mainframe computers from the correct 1960s era as discussed in the text.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/IBM_System_360_at_IBM_Japan_head_office.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/IBM_System_360_at_IBM_Japan_head_office.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:IBM_System_360_at_IBM_Japan_head_office.jpg",
+              "width": 1920,
+              "height": 3056,
+              "title": "IBM System 360 at IBM Japan head office.jpg",
+              "author": "IBM Japan",
+              "license": "Public domain",
+              "attribution_required": false,
+              "attribution": "\"IBM System 360 at IBM Japan head office.jpg\" (Public domain), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:IBM_System_360_at_IBM_Japan_head_office.jpg",
+              "year": 1967,
+              "desc": "IBM Japan's technicians and System/360 in the machine room, headquarter office of IBM Japan.",
+              "cats": "IBM System/360 Model 40; PD-Japan-organization; Works copyrighted in the U.S."
+            },
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/IBM_2030_in_New_Haven.jpg/1920px-IBM_2030_in_New_Haven.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/7/71/IBM_2030_in_New_Haven.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:IBM_2030_in_New_Haven.jpg",
+              "width": 1920,
+              "height": 2874,
+              "title": "IBM 2030 in New Haven.jpg",
+              "author": "Warren K. Leffler",
+              "license": "Public domain",
+              "attribution_required": false,
+              "attribution": "\"IBM 2030 in New Haven.jpg\" (Public domain), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:IBM_2030_in_New_Haven.jpg",
+              "year": 1967,
+              "desc": "Men in an IBM computer room in New Haven, Connecticut",
+              "cats": "New Haven, Connecticut; IBM System/360 Model 30; PD U.S. News & World Report; Computers in the United States; Library of Congress-no known copyright restrictions; IBM 2311 Disk Storage Drive"
+            },
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/IBM_System_360_at_USDA.jpg/1920px-IBM_System_360_at_USDA.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/IBM_System_360_at_USDA.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:IBM_System_360_at_USDA.jpg",
+              "width": 1920,
+              "height": 1524,
+              "title": "IBM System 360 at USDA.jpg",
+              "author": "U.S. Department of Agriculture",
+              "license": "Public domain",
+              "attribution_required": false,
+              "attribution": "\"IBM System 360 at USDA.jpg\" (Public domain), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:IBM_System_360_at_USDA.jpg",
+              "year": 1966,
+              "desc": "U.S. Department of Agriculture (USDA) Statistical Reporting Service (SRS) Administrator Harry Trelogan looks on as Agriculture Secretary Orville Freeman tests out some of the functions of the IBM 360 computer. The Washington Data Processing",
+              "cats": "Orville Freeman; IBM System/360 Model 40; Data processing; PD USDA; April 1966 in Washington, D.C.; Flickr images reviewed by FlickreviewR; Data centers in the United States; Files from U.S. Departmen"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Wesley Clark computer scientist",
+          "fallback": true,
+          "note": "editor kept 0/6: None of the candidates depict the computer scientist Wesley Clark; they show the unrelated general or historical figures with similar names.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Wesley Clark computer scientist",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Honeywell DDP-516 minicomputer",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Honeywell DDP-516 minicomputer",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "October 1967",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "October 1967"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Roger Scantlebury National Physical Laboratory",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Roger Scantlebury National Physical Laboratory",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "1024 Bits",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "1024 Bits"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Paul Baran RAND Corporation",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Paul Baran RAND Corporation",
+              "fallback": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "heading": "The IMP Guys and BBN",
+      "items": [
+        {
+          "type": "photo_historic",
+          "query": "Bolt Beranek and Newman office building 1960s",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Bolt Beranek and Newman office building 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Frank Heart computer engineer",
+          "fallback": false,
+          "note": "editor kept 1/3: Candidate 1 depicts the historic 1969 IMP Team including Frank Heart.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/f/f4/IMP_Team.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/f/f4/IMP_Team.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:IMP_Team.jpg",
+              "width": 1920,
+              "height": 973,
+              "title": "IMP Team.jpg",
+              "author": "Unknown authorUnknown author",
+              "license": "CC0",
+              "attribution_required": false,
+              "attribution": "\"IMP Team.jpg\" (CC0), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:IMP_Team.jpg",
+              "year": 1969,
+              "desc": "IMP Team (Left to Right): Truett Thatch, Bill Bartell (Honeywell), Dave Walden, Jim Geisman, Robert Kahn, Frank Heart, Ben Barker, Marty Thorpe, Will Crowther, Severo Ornstein. Not pictured: Bernie Cosell",
+              "cats": "CC-Zero; Frank Heart; Images with extracted images; Template Unknown (author); BBN people; Will Crowther; ARPANET people",
+              "from_source_article": true,
+              "article": "Interface Message Processor"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Honeywell DDP-516 minicomputer",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Honeywell DDP-516 minicomputer",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Bob Kahn computer scientist young",
+          "fallback": true,
+          "note": "editor kept 0/6: None of the candidates show a young Bob Kahn from the era of the ARPANET project.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Bob Kahn computer scientist young",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "BBN Report 1822 specification document",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "BBN Report 1822 specification document",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "24-bit Checksum",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "24-bit Checksum"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Interface Message Processor BBN 1969",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Interface Message Processor BBN 1969",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Interface Message Processor UCLA 1969",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Interface Message Processor UCLA 1969",
+              "fallback": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "heading": "The First Crash and Connection",
+      "items": [
+        {
+          "type": "photo_historic",
+          "query": "BBN Interface Message Processor 1969",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "BBN Interface Message Processor 1969",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "August 30, 1969",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "August 30, 1969"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Leonard Kleinrock UCLA 1969",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Leonard Kleinrock UCLA 1969",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Douglas Engelbart SRI 1969",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Douglas Engelbart SRI 1969",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "October 29, 1969",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "October 29, 1969"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Charley Kline SDS Sigma 7 UCLA",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Charley Kline SDS Sigma 7 UCLA",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "SDS 940 computer Stanford Research Institute",
+          "fallback": true,
+          "note": "editor kept 0/1: The candidate is a map sketch of ARPANET, not a photo of the requested SDS 940 computer at SRI.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "SDS 940 computer Stanford Research Institute",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "ARPANET logbook first message LO 1969",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "ARPANET logbook first message LO 1969",
+              "fallback": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "heading": "Taking Packets into the Air",
+      "items": [
+        {
+          "type": "photo_historic",
+          "query": "Norman Abramson University of Hawaii",
+          "fallback": false,
+          "note": "editor kept 1/1: The IEEE Milestone plaque directly commemorates ALOHAnet and Norman Abramson's work at the University of Hawaii.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Holmes_Hall_Manoa_ALOHAnet_IEEE_Milestone.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Holmes_Hall_Manoa_ALOHAnet_IEEE_Milestone.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:Holmes_Hall_Manoa_ALOHAnet_IEEE_Milestone.jpg",
+              "width": 1920,
+              "height": 1324,
+              "title": "Holmes Hall Manoa ALOHAnet IEEE Milestone.jpg",
+              "author": "Ron Hashiro",
+              "license": "Public domain",
+              "attribution_required": false,
+              "attribution": "\"Holmes Hall Manoa ALOHAnet IEEE Milestone.jpg\" (Public domain), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Holmes_Hall_Manoa_ALOHAnet_IEEE_Milestone.jpg",
+              "year": 2024,
+              "desc": "A photo of commerative IEEE plaque of the creation of ALOHAnet one of the early basis for future large scale networks.",
+              "cats": "PD-author; University of Hawaii at Manoa; ALOHAnet; Files with coordinates missing SDC location of creation; IEEE Milestone plaques",
+              "from_source_article": true,
+              "article": "ALOHAnet"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "University of Hawaii campus 1960s",
+          "fallback": false,
+          "note": "editor kept 1/1: The 1958 photo shows the campus library at the University of Hawaii during the correct era.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/6/67/%28Front_of_a_campus_library_at_the_University_of_Hawaii%2C_United_States%29_-_DPLA_-_708b75365b08eb07acc418225001fc5d.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/6/67/%28Front_of_a_campus_library_at_the_University_of_Hawaii%2C_United_States%29_-_DPLA_-_708b75365b08eb07acc418225001fc5d.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:(Front_of_a_campus_library_at_the_University_of_Hawaii,_United_States)_-_DPLA_-_708b75365b08eb07acc418225001fc5d.jpg",
+              "width": 1920,
+              "height": 1290,
+              "title": "(Front of a campus library at the University of Hawaii, United States) - DPLA - 708b75365b08eb07acc418225001fc5d.jpg",
+              "author": "Carlquist, Sherwin John, 1930-2021",
+              "license": "CC BY 4.0",
+              "attribution_required": true,
+              "attribution": "\"(Front of a campus library at the University of Hawaii, United States) - DPLA - 708b75365b08eb07acc418225001fc5d.jpg\" by Carlquist, Sherwin John, 1930-2021 (CC BY 4.0), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:(Front_of_a_campus_library_at_the_University_of_Hawaii,_United_States)_-_DPLA_-_708b75365b08eb07acc418225001fc5d.jpg",
+              "year": 1958,
+              "desc": "Photograph of the front of a campus library at the University of Hawaii, United States.1 photograph : positive, col. ; 35 mm.",
+              "cats": "Media contributed by the Digital Public Library of America; Media contributed by The Portal to Texas History; Media contributed by Botanical Research Institute of Texas"
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "September 1968",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "September 1968"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "vintage radio transmitter equipment 1970s",
+          "fallback": true,
+          "note": "editor kept 0/5: None of the candidates depict vintage radio transmitter equipment from the 1970s relevant to ALOHAnet.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "vintage radio transmitter equipment 1970s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "June 1971",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "June 1971"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "ALOHA System Menehune computer terminal",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "ALOHA System Menehune computer terminal",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "stock_modern",
+          "query": "blue ethernet cables plugged into server rack",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2018/03/09/14900-259623335_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2018/03/09/14900-259623335_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-14900/",
+              "width": 3840,
+              "height": 2160,
+              "duration": 24,
+              "title": "Pixabay video 14900",
+              "author": "cipnt",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by cipnt on Pixabay: https://pixabay.com/videos/id-14900/"
+            },
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2018/03/09/14906-259623339_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2018/03/09/14906-259623339_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-14906/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 8,
+              "title": "Pixabay video 14906",
+              "author": "cipnt",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by cipnt on Pixabay: https://pixabay.com/videos/id-14906/"
+            }
+          ]
+        },
+        {
+          "type": "stock_modern",
+          "query": "wifi wireless router blinking lights home",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2019/04/10/22739-330176863_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2019/04/10/22739-330176863_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-22739/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 16,
+              "title": "Pixabay video 22739",
+              "author": "juanrendonprod",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by juanrendonprod on Pixabay: https://pixabay.com/videos/id-22739/"
+            },
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2020/05/04/38084-416330724_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2020/05/04/38084-416330724_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-38084/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 8,
+              "title": "Pixabay video 38084",
+              "author": "mephala1980",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by mephala1980 on Pixabay: https://pixabay.com/videos/id-38084/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "heading": "The Language of the Internet",
+      "items": [
+        {
+          "type": "film_archive",
+          "query": "University of Hawaii campus 1970s",
+          "fallback": true,
+          "note": "archive footage not available automatically; using stills; editor kept 0/6: All candidates are photos of birds on the campus from the 2000s rather than historic campus footage from the 1970s.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "University of Hawaii campus 1970s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Vint Cerf and Bob Kahn 1970s",
+          "fallback": true,
+          "note": "editor kept 0/1: The candidate image is from 2010, not the 1970s.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Vint Cerf and Bob Kahn 1970s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "Transmission Control Program 1973",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Transmission Control Program 1973"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "TCP IP protocol diagram 1980s",
+          "fallback": true,
+          "note": "editor kept 0/6: All candidates are modern diagrams from the 2000s or 2010s rather than 1980s or 1970s source material.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "TCP IP protocol diagram 1980s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Louis Pouzin CYCLADES 1970s",
+          "fallback": true,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Louis Pouzin CYCLADES 1970s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Bob Metcalfe Xerox PARC 1970s",
+          "fallback": false,
+          "note": "editor kept 1/1: Shows the actual 1973 memo by Bob Metcalfe establishing Ethernet principles at Xerox PARC.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Metcalfe_Memo_Establishing_Basic_Principles_of_Ethernet_%28Cover_%2B_1st_page%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Metcalfe_Memo_Establishing_Basic_Principles_of_Ethernet_%28Cover_%2B_1st_page%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:Metcalfe_Memo_Establishing_Basic_Principles_of_Ethernet_(Cover_%2B_1st_page).jpg",
+              "width": 1920,
+              "height": 1284,
+              "title": "Metcalfe Memo Establishing Basic Principles of Ethernet (Cover + 1st page).jpg",
+              "author": "Robert Metcalfe",
+              "license": "Public domain",
+              "attribution_required": false,
+              "attribution": "\"Metcalfe Memo Establishing Basic Principles of Ethernet (Cover + 1st page).jpg\" (Public domain), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Metcalfe_Memo_Establishing_Basic_Principles_of_Ethernet_(Cover_%2B_1st_page).jpg",
+              "year": 1973,
+              "desc": "Opening of memo authored by Metcalfe at Xerox in 1973 establishing the basic principles of Ethernet",
+              "cats": "ARPANET; Xerox PARC; Ethernet; Internet history; Network protocols; PD US no notice 1989; PD-US missing SDC copyright status; Telecommunications diagrams; Computer-related introductions in 1980"
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "January 1 1983",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "January 1 1983"
+            }
+          ]
+        },
+        {
+          "type": "stock_modern",
+          "query": "global digital fiber optic network earth",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2015/11/02/1236-144355017_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2015/11/02/1236-144355017_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-1236/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 10,
+              "title": "Pixabay video 1236",
+              "author": "TBIT",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by TBIT on Pixabay: https://pixabay.com/videos/id-1236/"
+            },
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2016/01/29/1992-153555258_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2016/01/29/1992-153555258_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-1992/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 30,
+              "title": "Pixabay video 1992",
+              "author": "bellergy",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by bellergy on Pixabay: https://pixabay.com/videos/id-1992/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "heading": "The Verdict on the Nuclear Myth",
+      "items": [
+        {
+          "type": "photo_historic",
+          "query": "nuclear mushroom cloud test 1960s archive photo",
+          "fallback": false,
+          "note": "editor kept 1/6: Shows a historic nuclear test mushroom cloud suitable for the Cold War nuclear research context.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Trinity_Test_Mushroom_Cloud_12s.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Trinity_Test_Mushroom_Cloud_12s.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:Trinity_Test_Mushroom_Cloud_12s.jpg",
+              "width": 1920,
+              "height": 2378,
+              "title": "Trinity Test Mushroom Cloud 12s.jpg",
+              "author": "Federal government of the United States",
+              "license": "Public domain",
+              "attribution_required": false,
+              "attribution": "\"Trinity Test Mushroom Cloud 12s.jpg\" (Public domain), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Trinity_Test_Mushroom_Cloud_12s.jpg",
+              "year": 1945,
+              "desc": "Trinity Test - Alamogordo, NM - July 16, 1945. Mushroom cloud after 12 seconds.",
+              "cats": "Mushroom clouds; Trinity test; PD US DOE; Black and white photographs of New Mexico; Images from the NNSA/NSO Photo Library"
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "computer room with mainframes 1960s",
+          "fallback": true,
+          "note": "editor kept 0/1: None of the candidates clearly depict a standard 1960s mainframe computer room matching the query.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "computer room with mainframes 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "Paul Baran portrait 1960s",
+          "fallback": true,
+          "note": "editor kept 0/6: No valid portrait of computer scientist Paul Baran is present among the candidates.",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Paul Baran portrait 1960s",
+              "fallback": true
+            }
+          ]
+        },
+        {
+          "type": "photo_historic",
+          "query": "early ARPANET geographic map 1970s",
+          "fallback": false,
+          "note": "editor kept 2/2: Both maps accurately depict early ARPANET topology from the 1970s.",
+          "choices": [
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Arpanet_logical_map%2C_march_1977.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Arpanet_logical_map%2C_march_1977.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:Arpanet_logical_map,_march_1977.png",
+              "width": 1920,
+              "height": 1375,
+              "title": "Arpanet logical map, march 1977.png",
+              "author": "ARPANET",
+              "license": "Public domain",
+              "attribution_required": false,
+              "attribution": "\"Arpanet logical map, march 1977.png\" (Public domain), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Arpanet_logical_map,_march_1977.png",
+              "year": 1977,
+              "desc": "ARPANET logical map circa 1977",
+              "cats": "PD US no notice; Collections of the Computer History Museum; ARPANET maps; Internet diagrmams",
+              "from_source_article": true,
+              "article": "ARPANET"
+            },
+            {
+              "kind": "image",
+              "source": "commons",
+              "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Arpanet_map_1973.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+              "original_url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Arpanet_map_1973.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+              "page_url": "https://commons.wikimedia.org/wiki/File:Arpanet_map_1973.jpg",
+              "width": 1920,
+              "height": 1434,
+              "title": "Arpanet map 1973.jpg",
+              "author": "ARPANET",
+              "license": "Public domain",
+              "attribution_required": false,
+              "attribution": "\"Arpanet map 1973.jpg\" (Public domain), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Arpanet_map_1973.jpg",
+              "year": 1973,
+              "desc": "map of the ARPANET 1973",
+              "cats": "PD US no notice; Internet diagrams; ARPANET maps",
+              "from_source_article": true,
+              "article": "ARPANET"
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "NSFNET 1986",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "NSFNET 1986"
+            }
+          ]
+        },
+        {
+          "type": "text_graphic",
+          "query": "Decommissioned 1990",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "text",
+              "text": "Decommissioned 1990"
+            }
+          ]
+        },
+        {
+          "type": "stock_modern",
+          "query": "server racks blinking blue lights data center",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2018/03/09/14907-259623341_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2018/03/09/14907-259623341_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-14907/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 15,
+              "title": "Pixabay video 14907",
+              "author": "cipnt",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by cipnt on Pixabay: https://pixabay.com/videos/id-14907/"
+            },
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2016/07/25/4001-176277735_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2016/07/25/4001-176277735_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-4001/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 30,
+              "title": "Pixabay video 4001",
+              "author": "FindingFootage",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by FindingFootage on Pixabay: https://pixabay.com/videos/id-4001/"
+            }
+          ]
+        },
+        {
+          "type": "stock_modern",
+          "query": "diverse people using smart devices outdoors",
+          "fallback": false,
+          "note": "",
+          "choices": [
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2022/08/27/129288-743827388_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2022/08/27/129288-743827388_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-129288/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 10,
+              "title": "Pixabay video 129288",
+              "author": "Amorn_mimi",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by Amorn_mimi on Pixabay: https://pixabay.com/videos/id-129288/"
+            },
+            {
+              "kind": "video",
+              "source": "pixabay",
+              "url": "https://cdn.pixabay.com/video/2016/05/12/3180-166339024_large.mp4",
+              "thumb": "https://cdn.pixabay.com/video/2016/05/12/3180-166339024_large.jpg",
+              "page_url": "https://pixabay.com/videos/id-3180/",
+              "width": 1920,
+              "height": 1080,
+              "duration": 13,
+              "title": "Pixabay video 3180",
+              "author": "Coverr-Free-Footage",
+              "license": "Pixabay Content License",
+              "attribution_required": false,
+              "attribution": "Video by Coverr-Free-Footage on Pixabay: https://pixabay.com/videos/id-3180/"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
